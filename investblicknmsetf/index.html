@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETF-Handbuch f&uuml;r Einsteiger | InvestBlick Handbuch</title>
+<meta name="description" content="Alles &uuml;ber ETFs &ndash; von den Grundlagen bis zu Steuern und Strategie. Zum Nachschlagen, mit Suche. Keine Anlageberatung.">
+<meta name="theme-color" content="#0f1720">
+<link rel="canonical" href="https://investblick-nms.netlify.app/investblicknmsetf/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ETF-Handbuch f&uuml;r Einsteiger | InvestBlick Handbuch">
+<meta property="og:description" content="Alles &uuml;ber ETFs &ndash; von den Grundlagen bis zu Steuern und Strategie. Zum Nachschlagen, mit Suche. Keine Anlageberatung.">
+<meta property="og:url" content="https://investblick-nms.netlify.app/investblicknmsetf/">
+<meta property="og:image" content="https://investblick-nms.netlify.app/share-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233ba776'/%3E%3Cpolyline points='12,44 24,34 32,38 44,20 52,14' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='52' cy='14' r='3.5' fill='white'/%3E%3C/svg%3E">
+<style>
+  :root{--bg:#0f1720;--card:#182430;--card2:#1f2f3d;--line:#2c3e50;--text:#e8eef4;--muted:#93a4b5;--accent:#3ba776;--gold:#e0b64f;--blue:#4f9cf0;--down:#e0685a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  .nav{position:sticky;top:0;z-index:40;background:rgba(15,23,32,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .navin{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .brand{font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .brand .logo{background:var(--accent);color:#fff;border-radius:8px;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center}
+  .navlinks{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+  .navlinks a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;padding:7px 11px;border-radius:8px;border:1px solid transparent;white-space:nowrap}
+  .navlinks a:hover{color:var(--text);background:var(--card)}
+  .searchbar{width:100%;margin-top:4px}
+  .searchbar input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px 14px;font-size:15px}
+  .wrap{max-width:1200px;margin:0 auto;padding:22px 20px 60px;display:grid;grid-template-columns:250px 1fr;gap:26px;align-items:start}
+  @media(max-width:860px){.wrap{grid-template-columns:1fr}}
+  .toc{position:sticky;top:120px;max-height:calc(100vh - 140px);overflow:auto;font-size:13.5px}
+  @media(max-width:860px){.toc{position:static;max-height:none;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}}
+  .toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
+  .toc h4:first-child{margin-top:0}
+  .toc a{display:block;color:var(--muted);text-decoration:none;padding:5px 8px;border-radius:7px;border-left:2px solid transparent}
+  .toc a:hover{color:var(--text);background:var(--card);border-left-color:var(--accent)}
+  .hero{margin-bottom:8px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .hero p{color:var(--muted);margin-top:6px;font-size:15px}
+  .banner{background:rgba(224,182,79,.10);border:1px solid rgba(224,182,79,.35);color:#f0d692;border-radius:10px;padding:11px 14px;font-size:12.5px;margin:16px 0}
+  .hbsec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:16px;scroll-margin-top:130px}
+  .hbsec h2{font-size:21px;font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
+  .hbsec h3{font-size:16px;margin:18px 0 6px;color:var(--text)}
+  .hbsec p{margin:10px 0;color:#d6dee7}
+  .hbsec ul,.hbsec ol{margin:10px 0 10px 22px;color:#d6dee7}
+  .hbsec li{margin:5px 0}
+  .hbsec strong{color:#fff}
+  .tip{background:var(--card2);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:14px}
+  .warn{background:rgba(224,104,90,.10);border-left:3px solid var(--down);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:14px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card2);color:var(--muted)}
+  .noresult{display:none;color:var(--muted);padding:20px;text-align:center}
+  .footer{color:var(--muted);font-size:12.5px;line-height:1.7;border-top:1px solid var(--line);margin-top:26px;padding-top:18px;text-align:center}
+  .footer a{color:var(--muted);margin:0 6px}
+  /* Consent gate */
+  #gate{position:fixed;inset:0;background:rgba(6,10,14,.95);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+  #gate .box{max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
+  #gate .inner{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13.5px;max-height:230px;overflow:auto;line-height:1.6}
+  #gate label{display:flex;gap:10px;align-items:flex-start;margin:16px 0;font-size:14px;cursor:pointer}
+  #gate input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:2px}
+  .btn{width:100%;background:var(--accent);border:none;color:#fff;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  html{scroll-behavior:smooth}
+  .toc a.active{color:var(--accent);background:var(--card);border-left-color:var(--accent)}
+  .totop{position:fixed;right:18px;bottom:18px;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:22px;display:none;z-index:50;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+  .totop.show{display:block}
+</style>
+</head><body>
+
+<div id="gate"><div class="box">
+  <div style="text-align:center;font-size:30px">&#9878;</div>
+  <h2 style="text-align:center;margin:6px 0 4px;font-size:20px">Bevor es losgeht</h2>
+  <p style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px">Bitte kurz lesen und best&auml;tigen.</p>
+  <div class="inner">
+    <p><strong>Keine Anlageberatung.</strong> Dieses Handbuch dient ausschlie&szlig;lich der allgemeinen Information und Bildung. Es stellt keine Anlage-, Finanz-, Steuer- oder Rechtsberatung und keine Kauf-/Verkaufsempfehlung dar.</p>
+    <p style="margin-top:8px">Angaben ohne Gew&auml;hr. Investieren ist mit Risiken bis zum Totalverlust verbunden. Vergangene Wertentwicklung garantiert keine zuk&uuml;nftige. Entscheidungen triffst du eigenverantwortlich.</p>
+  </div>
+  <label><input type="checkbox" id="gc"> Ich habe die Hinweise gelesen und verstanden. Mir ist bewusst, dass dies <strong>keine Anlageberatung</strong> ist.</label>
+  <button id="gb" class="btn" disabled>Akzeptieren &amp; lesen</button>
+</div></div>
+
+<div class="nav"><div class="navin">
+  <div class="brand"><span class="logo">&#128200;</span> InvestBlick</div>
+  <div class="navlinks">
+    <a href="../">&#8592; Zur App</a>
+    <a href="../investblicknmsaktien/">Aktien-Handbuch &rarr;</a>
+  </div>
+  <div class="searchbar"><input type="text" id="hbSearch" placeholder="&#128269; Im Handbuch suchen (z. B. Steuern, TER, Dividende, Risiko) &hellip;" aria-label="Suche"></div>
+</div></div>
+
+<div class="wrap">
+  <nav class="toc" id="toc" aria-label="Inhaltsverzeichnis"><h4>1 &middot; Grundlagen</h4><a href="#was-ist-etf">Was ist ein ETF?</a><a href="#funktion">Wie ein ETF funktioniert (Index)</a><a href="#sondervermoegen">Sonderverm&ouml;gen: dein Geld ist gesch&uuml;tzt</a><a href="#etf-vs-fonds">ETF vs. aktiver Fonds</a><a href="#vor-nachteile">Vorteile und Nachteile</a><h4>2 &middot; Merkmale &amp; Begriffe</h4><a href="#ter">Kosten: TER &amp; Tracking Difference</a><a href="#replikation">Replikation: physisch, Sampling, synthetisch</a><a href="#aussch-thes">Aussch&uuml;ttend vs. thesaurierend</a><a href="#kennzahlen">Fondsvolumen, Alter, Domizil, ISIN</a><h4>3 &middot; Arten von ETFs</h4><a href="#arten">Die wichtigsten ETF-Arten im &Uuml;berblick</a><a href="#indizes">Bekannte Indizes (MSCI World &amp; Co.)</a><a href="#themen">Themen- &amp; Branchen-ETFs</a><a href="#weitere">Anleihen-, Rohstoff-, Dividenden- &amp; Faktor-ETFs</a><h4>4 &middot; Ausw&auml;hlen &amp; Investieren</h4><a href="#auswahl">Den richtigen ETF ausw&auml;hlen</a><a href="#depot">Depot &amp; Broker</a><a href="#sparplan">ETF-Sparplan starten</a><a href="#strategien">Strategien: 70/30, Core-Satellite, Rebalancing</a><h4>5 &middot; Risiken &amp; Steuern</h4><a href="#risiken">Risiken von ETFs</a><a href="#steuern">Steuern f&uuml;r ETFs in Deutschland</a><a href="#fehler">H&auml;ufige Fehler</a><h4>6 &middot; Nachschlagen</h4><a href="#schritt">Schritt f&uuml;r Schritt: dein erster ETF</a><a href="#glossar">Glossar</a><a href="#faq">FAQ</a><h4>Rechtliches & Kontakt</h4><a href="#impressum">Impressum & Kontakt</a><a href="#datenschutz">Datenschutzerkl&auml;rung</a><a href="#haftung">Haftungsausschluss</a></nav>
+  <main>
+    <div class="hero"><h1>ETF-Handbuch f&uuml;r Einsteiger</h1><p>Alles &uuml;ber ETFs &ndash; von den Grundlagen bis zu Steuern und Strategie. Zum Nachschlagen, mit Suche. Keine Anlageberatung.</p></div>
+    <div class="banner">&#9888;&#65039; <strong>Keine Anlageberatung.</strong> Reines Info- &amp; Bildungsangebot. Alle Angaben ohne Gew&auml;hr, Stand 2025/2026. Steuer-/Rechtsthemen im Zweifel fachlich pr&uuml;fen lassen.</div>
+    <section class="hbsec" id="was-ist-etf"><h2>Was ist ein ETF?</h2>
+   <p>ETF steht f&uuml;r <strong>Exchange Traded Fund</strong>, auf Deutsch: b&ouml;rsengehandelter Indexfonds. Vereinfacht ist ein ETF ein <strong>Korb aus vielen Wertpapieren</strong> (z. B. Aktien oder Anleihen), den du als ein einziges Papier an der B&ouml;rse kaufen kannst.</p>
+   <p>Statt einzelne Firmen auszuw&auml;hlen, kaufst du mit einem ETF <strong>einen ganzen Markt auf einen Schlag</strong>. Ein ETF auf den MSCI World enth&auml;lt z. B. rund 1.500 gro&szlig;e Firmen aus Industriel&auml;ndern weltweit.</p>
+   <ul>
+     <li><strong>Breit gestreut:</strong> dein Risiko verteilt sich automatisch auf viele Werte.</li>
+     <li><strong>G&uuml;nstig:</strong> ETFs kosten meist nur 0,1&ndash;0,5 % pro Jahr.</li>
+     <li><strong>Einfach:</strong> ein Kauf gen&uuml;gt, kein st&auml;ndiges Beobachten n&ouml;tig.</li>
+     <li><strong>Transparent:</strong> du wei&szlig;t jederzeit, was drin ist.</li>
+   </ul>
+   <div class="tip">Merksatz: Ein ETF ist wie ein fertig gepackter Einkaufskorb &ndash; du kaufst nicht jede Ware einzeln, sondern den ganzen Korb.</div>
+  </section>
+<section class="hbsec" id="funktion"><h2>Wie ein ETF funktioniert (Index)</h2>
+   <p>Ein ETF bildet einen <strong>Index</strong> nach. Ein Index ist eine Liste, die die Wertentwicklung eines Marktes misst &ndash; z. B. der DAX (40 gr&ouml;&szlig;te deutsche Firmen) oder der MSCI World.</p>
+   <p>Der ETF versucht, diesen Index <strong>so genau wie m&ouml;glich abzubilden</strong>. Steigt der Index um 5 %, soll auch der ETF um etwa 5 % steigen. Das nennt man <strong>passives Investieren</strong>: Der ETF versucht nicht, den Markt zu schlagen, sondern ihn abzubilden.</p>
+   <h3>Warum das clever ist</h3>
+   <p>Studien zeigen seit Jahrzehnten: Die <strong>meisten aktiv gemanagten Fonds schlagen ihren Index langfristig nicht</strong> &ndash; vor allem wegen ihrer hohen Kosten. Ein g&uuml;nstiger Index-ETF liefert dir schlicht die Marktrendite, und die ist historisch ordentlich.</p>
+  </section>
+<section class="hbsec" id="sondervermoegen"><h2>Sonderverm&ouml;gen: dein Geld ist gesch&uuml;tzt</h2>
+   <p>Ein wichtiger Sicherheitspunkt: Das Geld in einem ETF ist rechtlich <strong>Sonderverm&ouml;gen</strong>. Das hei&szlig;t, es ist vom Verm&ouml;gen der Fondsgesellschaft <strong>getrennt</strong>.</p>
+   <p>Geht die Fondsgesellschaft oder deine Bank pleite, <strong>bleibt dein ETF-Anteil dein Eigentum</strong> &ndash; er f&auml;llt nicht in die Insolvenzmasse. Das Kursrisiko der enthaltenen Aktien tr&auml;gst du nat&uuml;rlich weiter selbst.</p>
+   <div class="tip">Sonderverm&ouml;gen sch&uuml;tzt vor der <em>Pleite des Anbieters</em>, nicht vor <em>Kursverlusten</em> am Markt.</div>
+  </section>
+<section class="hbsec" id="etf-vs-fonds"><h2>ETF vs. aktiver Fonds</h2>
+   <table>
+     <tr><th>Merkmal</th><th>ETF (passiv)</th><th>Aktiver Fonds</th></tr>
+     <tr><td>Ziel</td><td>Index abbilden</td><td>Index schlagen</td></tr>
+     <tr><td>Kosten p.a.</td><td>ca. 0,1&ndash;0,5 %</td><td>oft 1,5&ndash;2,5 %</td></tr>
+     <tr><td>Manager</td><td>keiner n&ouml;tig</td><td>Fondsmanager entscheidet</td></tr>
+     <tr><td>Transparenz</td><td>hoch</td><td>oft geringer</td></tr>
+     <tr><td>Langfrist-Ergebnis</td><td>meist Marktrendite</td><td>schl&auml;gt Index selten dauerhaft</td></tr>
+   </table>
+   <p>F&uuml;r die meisten Einsteiger sind g&uuml;nstige, breite ETFs die einfachere und historisch oft bessere Wahl. Das ist eine allgemeine Einordnung, keine Empfehlung.</p>
+  </section>
+<section class="hbsec" id="vor-nachteile"><h2>Vorteile und Nachteile</h2>
+   <h3>Vorteile</h3>
+   <ul><li>Breite Streuung mit einem Kauf</li><li>Niedrige Kosten</li><li>B&ouml;rsent&auml;glich handelbar</li><li>Sonderverm&ouml;gen (Anbieter-Insolvenz gesch&uuml;tzt)</li><li>Schon ab kleinen Sparraten m&ouml;glich</li></ul>
+   <h3>Nachteile / Grenzen</h3>
+   <ul><li>Keine &Uuml;berrendite &ndash; du bekommst &bdquo;nur&ldquo; die Marktrendite</li><li>Kursschwankungen (auch deutliche Verluste m&ouml;glich)</li><li>Bei Themen-ETFs Klumpenrisiko</li><li>Bei synthetischen ETFs theoretisch Kontrahentenrisiko</li></ul>
+  </section>
+<section class="hbsec" id="ter"><h2>Kosten: TER &amp; Tracking Difference</h2>
+   <p>Die <strong>TER (Total Expense Ratio)</strong> ist die j&auml;hrliche Verwaltungsgeb&uuml;hr eines ETFs, angegeben in Prozent (z. B. 0,20 %). Sie wird automatisch aus dem Fondsverm&ouml;gen entnommen &ndash; du zahlst sie nicht extra, sie mindert aber deine Rendite.</p>
+   <p>Noch aussagekr&auml;ftiger ist die <strong>Tracking Difference (TD)</strong>: der tats&auml;chliche Unterschied zwischen ETF und Index &uuml;ber ein Jahr. Manchmal ist die TD sogar kleiner als die TER (z. B. durch Einnahmen aus Wertpapierleihe).</p>
+   <div class="tip">Faustregel: bei breiten Standard-ETFs auf TER unter ca. 0,25 % achten. Kosten sind einer der wenigen Faktoren, die du wirklich kontrollieren kannst.</div>
+  </section>
+<section class="hbsec" id="replikation"><h2>Replikation: physisch, Sampling, synthetisch</h2>
+   <ul>
+     <li><strong>Physisch (vollst&auml;ndig):</strong> Der ETF kauft wirklich alle Aktien des Index. Einfach und transparent.</li>
+     <li><strong>Physisch (Sampling):</strong> Der ETF kauft nur eine repr&auml;sentative Auswahl &ndash; sinnvoll bei sehr gro&szlig;en Indizes.</li>
+     <li><strong>Synthetisch (Swap):</strong> Der ETF bildet den Index &uuml;ber ein Tauschgesch&auml;ft (Swap) mit einer Bank ab, statt die Aktien zu halten. Kann g&uuml;nstig/pr&auml;zise sein, bringt aber ein geringes <strong>Kontrahentenrisiko</strong> (falls der Swap-Partner ausf&auml;llt; meist besichert).</li>
+   </ul>
+   <p>F&uuml;r Einsteiger sind <strong>physisch replizierende</strong> ETFs oft die intuitivere Wahl.</p>
+  </section>
+<section class="hbsec" id="aussch-thes"><h2>Aussch&uuml;ttend vs. thesaurierend</h2>
+   <p>Das beschreibt, was mit den Dividenden im ETF passiert:</p>
+   <ul>
+     <li><strong>Aussch&uuml;ttend:</strong> Dividenden werden dir regelm&auml;&szlig;ig aufs Konto ausgezahlt. Gut, wenn du laufendes Einkommen willst.</li>
+     <li><strong>Thesaurierend:</strong> Dividenden werden automatisch wieder im ETF angelegt. St&auml;rkerer Zinseszins, weniger Aufwand &ndash; beliebt f&uuml;r langfristigen Verm&ouml;gensaufbau.</li>
+   </ul>
+   <div class="tip">Fokus Verm&ouml;gensaufbau &rarr; oft thesaurierend. Fokus regelm&auml;&szlig;iges Einkommen &rarr; aussch&uuml;ttend.</div>
+  </section>
+<section class="hbsec" id="kennzahlen"><h2>Fondsvolumen, Alter, Domizil, ISIN</h2>
+   <ul>
+     <li><strong>Fondsvolumen:</strong> Wie viel Geld im ETF steckt. Gr&ouml;&szlig;er als ca. 100&ndash;500 Mio. Euro gilt als solide (geringere Gefahr der Schlie&szlig;ung).</li>
+     <li><strong>Auflagedatum / Alter:</strong> &Auml;ltere ETFs haben eine l&auml;ngere nachvollziehbare Historie.</li>
+     <li><strong>Fondsdomizil:</strong> H&auml;ufig Irland (IE) oder Luxemburg (LU) &ndash; steuerlich f&uuml;r deutsche Anleger meist g&uuml;nstig.</li>
+     <li><strong>ISIN / WKN:</strong> die eindeutige &bdquo;Ausweisnummer&ldquo; des ETFs, mit der du ihn beim Broker findest.</li>
+     <li><strong>Fondsw&auml;hrung vs. W&auml;hrungsrisiko:</strong> Die angezeigte W&auml;hrung ist nur die Anzeige. Entscheidend ist, in welchen W&auml;hrungen die Firmen im Index Umsatz machen (W&auml;hrungsrisiko l&auml;sst sich nicht wegkaufen).</li>
+   </ul>
+  </section>
+<section class="hbsec" id="arten"><h2>Die wichtigsten ETF-Arten im &Uuml;berblick</h2>
+   <ul>
+     <li><strong>Welt-/Regionen-ETFs:</strong> MSCI World, FTSE All-World, S&amp;P 500, Emerging Markets.</li>
+     <li><strong>Branchen-/Themen-ETFs:</strong> Technologie, KI, Gesundheit, Clean Energy.</li>
+     <li><strong>Dividenden-ETFs:</strong> Fokus auf aussch&uuml;ttungsstarke Firmen.</li>
+     <li><strong>Faktor-/Smart-Beta-ETFs:</strong> Quality, Value, Momentum, Small Cap.</li>
+     <li><strong>Anleihen-ETFs:</strong> Staats- und Unternehmensanleihen.</li>
+     <li><strong>Rohstoff-/Gold-ETCs:</strong> z. B. physisch besichertes Gold.</li>
+     <li><strong>Geldmarkt-ETFs:</strong> sehr sicher, tagesgeld-&auml;hnlich.</li>
+   </ul>
+  </section>
+<section class="hbsec" id="indizes"><h2>Bekannte Indizes (MSCI World &amp; Co.)</h2>
+   <table>
+     <tr><th>Index</th><th>Was steckt drin</th></tr>
+     <tr><td>MSCI World</td><td>~1.500 gro&szlig;e Firmen aus Industriel&auml;ndern</td></tr>
+     <tr><td>FTSE All-World / MSCI ACWI</td><td>Industrie- <em>und</em> Schwellenl&auml;nder (noch breiter)</td></tr>
+     <tr><td>S&amp;P 500</td><td>500 gr&ouml;&szlig;te US-Firmen</td></tr>
+     <tr><td>MSCI Emerging Markets</td><td>Schwellenl&auml;nder (China, Indien, Brasilien &hellip;)</td></tr>
+     <tr><td>STOXX Europe 600</td><td>600 europ&auml;ische Firmen</td></tr>
+     <tr><td>NASDAQ 100</td><td>100 gro&szlig;e US-Tech-Firmen</td></tr>
+   </table>
+   <p>F&uuml;r maximale Streuung mit einem Produkt ist ein <strong>FTSE All-World</strong> beliebt (eine ETF-L&ouml;sung f&uuml;rs ganze Weltdepot).</p>
+  </section>
+<section class="hbsec" id="themen"><h2>Themen- &amp; Branchen-ETFs</h2>
+   <p>Themen-ETFs setzen gezielt auf einen Trend (KI, Robotik, Halbleiter, Wasser, Cybersecurity). Das kann hohe Chancen bringen, aber:</p>
+   <div class="warn">Themen-ETFs streuen enger &rarr; <strong>h&ouml;heres Risiko und st&auml;rkere Schwankungen</strong>. Oft sind sie zudem teurer (h&ouml;here TER) und stark von wenigen gro&szlig;en Firmen abh&auml;ngig.</div>
+   <p>Als <strong>Beimischung</strong> zu einem breiten Welt-ETF k&ouml;nnen sie interessant sein &ndash; als alleiniges Investment sind sie riskanter.</p>
+  </section>
+<section class="hbsec" id="weitere"><h2>Anleihen-, Rohstoff-, Dividenden- &amp; Faktor-ETFs</h2>
+   <ul>
+     <li><strong>Anleihen-ETFs:</strong> b&uuml;ndeln viele Anleihen. Schwanken weniger als Aktien und dienen oft als Stabilit&auml;ts-Baustein.</li>
+     <li><strong>Gold-ETC:</strong> streng genommen kein ETF, sondern eine besicherte Schuldverschreibung auf Gold &ndash; als Krisen-Baustein beliebt, zahlt aber keine Zinsen/Dividenden.</li>
+     <li><strong>Dividenden-ETFs:</strong> Fokus auf hohe/verl&auml;ssliche Aussch&uuml;ttungen (z. B. Aristokraten).</li>
+     <li><strong>Faktor-/Smart-Beta:</strong> gewichten nach Kriterien wie Qualit&auml;t oder G&uuml;nstigkeit statt nach Gr&ouml;&szlig;e.</li>
+     <li><strong>Geldmarkt-ETFs:</strong> parken Geld sehr sicher zu kurzfristigen Zinsen.</li>
+   </ul>
+  </section>
+<section class="hbsec" id="auswahl"><h2>Den richtigen ETF ausw&auml;hlen</h2>
+   <p>Checkliste f&uuml;r einen soliden Standard-ETF:</p>
+   <ol>
+     <li><strong>Breiter Index?</strong> (MSCI World / All-World f&uuml;r die Basis)</li>
+     <li><strong>Niedrige TER?</strong> (ideal unter 0,25 %)</li>
+     <li><strong>Gute Tracking Difference?</strong> (bildet den Index sauber ab)</li>
+     <li><strong>Gro&szlig;es Fondsvolumen?</strong> (Schlie&szlig;ungsrisiko gering)</li>
+     <li><strong>Aussch&uuml;ttend oder thesaurierend?</strong> (nach deinem Ziel)</li>
+     <li><strong>Physisch replizierend?</strong> (einfacher zu verstehen)</li>
+     <li><strong>Domizil Irland/Luxemburg?</strong> (steuerlich meist g&uuml;nstig)</li>
+   </ol>
+   <div class="tip">Vergleichsseiten wie justETF oder extraETF helfen beim Filtern nach diesen Kriterien.</div>
+  </section>
+<section class="hbsec" id="depot"><h2>Depot &amp; Broker</h2>
+   <p>Zum Kauf brauchst du ein <strong>Wertpapierdepot</strong>. Anbieter sind klassische Direktbanken oder g&uuml;nstige <strong>Neobroker</strong> (App-Broker).</p>
+   <p>Worauf achten:</p>
+   <ul>
+     <li><strong>Sparplan-Geb&uuml;hren</strong> (idealerweise kostenlos)</li>
+     <li><strong>Ordergeb&uuml;hren</strong> beim Einmalkauf</li>
+     <li><strong>Auswahl an ETFs/Sparpl&auml;nen</strong></li>
+     <li><strong>Reguliert / Einlagensicherung</strong> (Sonderverm&ouml;gen gilt ohnehin)</li>
+   </ul>
+   <div class="warn">Dieses Handbuch nennt bewusst keine konkrete Bank als Empfehlung. Vergleiche selbst Kosten und Leistungen.</div>
+  </section>
+<section class="hbsec" id="sparplan"><h2>ETF-Sparplan starten</h2>
+   <p>Ein <strong>Sparplan</strong> kauft automatisch jeden Monat f&uuml;r einen festen Betrag Anteile &ndash; schon ab ca. 25 Euro.</p>
+   <p>Vorteil: der <strong>Cost-Average-Effekt</strong>. Bei niedrigen Kursen bekommst du mehr Anteile, bei hohen weniger. Du musst den perfekten Zeitpunkt nicht treffen.</p>
+   <ol>
+     <li>Depot er&ouml;ffnen</li>
+     <li>Breiten ETF ausw&auml;hlen (ISIN eingeben)</li>
+     <li>Sparplan mit Rate + Intervall einrichten</li>
+     <li>Laufen lassen und dranbleiben</li>
+   </ol>
+   <p>Wie sich ein Sparplan entwickeln k&ouml;nnte, kannst du in der <a href="../">InvestBlick-App</a> durchrechnen.</p>
+  </section>
+<section class="hbsec" id="strategien"><h2>Strategien: 70/30, Core-Satellite, Rebalancing</h2>
+   <ul>
+     <li><strong>Buy and Hold:</strong> kaufen und langfristig halten &ndash; die einfachste, oft erfolgreichste Strategie.</li>
+     <li><strong>Ein-ETF-L&ouml;sung:</strong> ein FTSE All-World deckt die ganze Welt ab.</li>
+     <li><strong>70/30:</strong> 70 % MSCI World + 30 % Emerging Markets &ndash; klassische Selbstbau-Weltverteilung.</li>
+     <li><strong>Core-Satellite:</strong> gro&szlig;er breiter &bdquo;Kern&ldquo; + kleine Themen-/Einzelwetten als &bdquo;Satelliten&ldquo;.</li>
+     <li><strong>Rebalancing:</strong> einmal j&auml;hrlich die urspr&uuml;ngliche Gewichtung wiederherstellen.</li>
+   </ul>
+  </section>
+<section class="hbsec" id="risiken"><h2>Risiken von ETFs</h2>
+   <ul>
+     <li><strong>Marktrisiko:</strong> F&auml;llt der Markt, f&auml;llt dein ETF. Zwischenzeitliche Minus-30-%-Phasen sind historisch normal.</li>
+     <li><strong>W&auml;hrungsrisiko:</strong> Bei Welt-ETFs spielt der Dollar-Kurs mit hinein.</li>
+     <li><strong>Klumpenrisiko:</strong> Themen-/L&auml;nder-ETFs sind weniger gestreut.</li>
+     <li><strong>Kontrahentenrisiko:</strong> nur bei synthetischen ETFs, meist besichert.</li>
+     <li><strong>Wertpapierleihe:</strong> viele ETFs verleihen Aktien gegen Sicherheiten &ndash; kleines Zusatzrisiko, meist gering.</li>
+   </ul>
+   <div class="tip">Zeit im Markt schl&auml;gt Timing: Je l&auml;nger der Horizont, desto stärker gleichen sich gute und schlechte Jahre aus.</div>
+  </section>
+<section class="hbsec" id="steuern"><h2>Steuern f&uuml;r ETFs in Deutschland</h2>
+   <p>Wichtig: allgemeine Infos, <strong>keine Steuerberatung</strong>. Stand 2025/2026, ohne Gew&auml;hr.</p>
+   <ul>
+     <li><strong>Abgeltungssteuer:</strong> auf Gewinne und Aussch&uuml;ttungen 25 % + 5,5 % Soli (+ ggf. Kirchensteuer) &rarr; rund <strong>26,375 %</strong>.</li>
+     <li><strong>Sparerpauschbetrag:</strong> <strong>1.000 &euro; pro Jahr</strong> und Person sind steuerfrei &ndash; per <strong>Freistellungsauftrag</strong> bei der Bank aktivieren.</li>
+     <li><strong>Teilfreistellung:</strong> bei Aktien-ETFs bleiben <strong>30 %</strong> der Ertr&auml;ge steuerfrei (nur 70 % werden versteuert).</li>
+     <li><strong>Vorabpauschale:</strong> eine kleine j&auml;hrliche Vorab-Besteuerung bei thesaurierenden Fonds. Der Basiszins f&uuml;r 2025 liegt bei 2,53 %. Die Bank berechnet und f&uuml;hrt das <strong>automatisch</strong> ab &ndash; du musst nichts selbst tun.</li>
+   </ul>
+   <div class="tip">In der <a href="../">InvestBlick-App</a> kannst du den Schalter &bdquo;Nach Steuern &amp; Kosten&ldquo; aktivieren, um eine grobe Netto-Sch&auml;tzung zu sehen.</div>
+  </section>
+<section class="hbsec" id="fehler"><h2>H&auml;ufige Fehler</h2>
+   <ul>
+     <li><strong>Panik-Verkauf</strong> beim Crash &ndash; realisiert Verluste.</li>
+     <li><strong>Zu viele Themen-ETFs</strong> statt breiter Basis.</li>
+     <li><strong>St&auml;ndiges Umschichten</strong> &ndash; kostet Geb&uuml;hren und Nerven.</li>
+     <li><strong>Auf TER schauen, TD ignorieren.</strong></li>
+     <li><strong>Ohne Notgroschen investieren</strong> und dann im Tief verkaufen m&uuml;ssen.</li>
+     <li><strong>Freistellungsauftrag vergessen</strong> &ndash; zahlt unn&ouml;tig Steuern.</li>
+   </ul>
+  </section>
+<section class="hbsec" id="schritt"><h2>Schritt f&uuml;r Schritt: dein erster ETF</h2>
+   <ol>
+     <li>Notgroschen (2&ndash;3 Monatsausgaben) beiseitelegen.</li>
+     <li>Depot bei einem g&uuml;nstigen Broker er&ouml;ffnen.</li>
+     <li>Breiten Welt-ETF w&auml;hlen (z. B. MSCI World oder FTSE All-World).</li>
+     <li>Sparplan einrichten (Betrag, den du langfristig entbehren kannst).</li>
+     <li>Freistellungsauftrag (bis 1.000 &euro;) setzen.</li>
+     <li>Dranbleiben, Schwankungen aushalten, selten reinschauen.</li>
+   </ol>
+   <div class="warn">Nur Geld anlegen, das du viele Jahre nicht brauchst. Keine Anlageberatung &ndash; im Zweifel unabh&auml;ngig beraten lassen.</div>
+  </section>
+<section class="hbsec" id="glossar"><h2>Glossar</h2>
+   <ul>
+     <li><strong>Index:</strong> Messlatte f&uuml;r einen Markt.</li>
+     <li><strong>TER:</strong> j&auml;hrliche Kostenquote.</li>
+     <li><strong>TD:</strong> tats&auml;chliche Abweichung ETF vs. Index.</li>
+     <li><strong>Replikation:</strong> Art, wie der ETF den Index nachbildet.</li>
+     <li><strong>Thesaurierend:</strong> Ertr&auml;ge werden reinvestiert.</li>
+     <li><strong>Aussch&uuml;ttend:</strong> Ertr&auml;ge werden ausgezahlt.</li>
+     <li><strong>Sonderverm&ouml;gen:</strong> gesch&uuml;tztes, getrenntes Fondsverm&ouml;gen.</li>
+     <li><strong>Cost-Average:</strong> Durchschnittskosten-Effekt beim Sparplan.</li>
+     <li><strong>Rebalancing:</strong> Zur&uuml;cksetzen der Wunsch-Gewichtung.</li>
+   </ul>
+  </section>
+<section class="hbsec" id="faq"><h2>FAQ</h2>
+   <h3>Wie viel Geld brauche ich zum Start?</h3>
+   <p>Sparpl&auml;ne gibt es ab ca. 25 &euro; im Monat. Jeder Betrag ist besser als keiner.</p>
+   <h3>Sind ETFs sicher?</h3>
+   <p>Sie sind breit gestreut und als Sonderverm&ouml;gen vor Anbieter-Pleiten gesch&uuml;tzt &ndash; aber Kursverluste sind jederzeit m&ouml;glich.</p>
+   <h3>Ein ETF oder mehrere?</h3>
+   <p>F&uuml;r den Anfang reicht oft ein breiter Welt-ETF. Mehr Produkte hei&szlig;t mehr Aufwand, nicht automatisch mehr Rendite.</p>
+   <h3>Wann verkaufe ich?</h3>
+   <p>Idealerweise erst, wenn du das Geld brauchst. Buy and Hold ist die einfachste Linie.</p>
+  </section>
+<section class="hbsec" id="impressum"><h2>Impressum & Kontakt</h2>
+    <p><strong>Angaben gem&auml;&szlig; &sect; 5 DDG (Digitale-Dienste-Gesetz)</strong></p>
+    <p>Niklas Schulz<br>Waldstr. 28<br>24939 Flensburg<br>Deutschland</p>
+    <p><strong>Kontakt:</strong> E-Mail: Niklas.ma.schulz@gmail.com</p>
+    <p><strong>Verantwortlich f&uuml;r den Inhalt nach &sect; 18 Abs. 2 MStV:</strong> Niklas Schulz, Anschrift wie oben.</p>
+    <p>Die Inhalte dienen ausschlie&szlig;lich der Information und Bildung und stellen keine Anlageberatung dar. F&uuml;r Richtigkeit, Vollst&auml;ndigkeit und Aktualit&auml;t wird keine Gew&auml;hr &uuml;bernommen. F&uuml;r externe Links ist stets der jeweilige Anbieter verantwortlich.</p>
+    </section>
+<section class="hbsec" id="datenschutz"><h2>Datenschutzerkl&auml;rung</h2>
+    <p><strong>Verantwortlicher:</strong> Niklas Schulz, Waldstr. 28, 24939 Flensburg, E-Mail: Niklas.ma.schulz@gmail.com.</p>
+    <h3>Grunds&auml;tzliches</h3>
+    <p>Diese Seite ist ein reines Info-Handbuch. Es gibt keine Benutzerkonten, keine Newsletter-Anmeldung, keine Werbe-Cookies und keine Tracking-Dienste. Es werden keine personenbezogenen Daten aktiv erhoben.</p>
+    <h3>Hosting &amp; Server-Logs</h3>
+    <p>Die Seite wird bei einem externen Hoster betrieben. Technisch notwendige Daten (u. a. IP-Adresse, Datum/Uhrzeit, abgerufene Datei) werden in Server-Logdateien verarbeitet, um Auslieferung und Sicherheit zu gew&auml;hrleisten (Art. 6 Abs. 1 lit. f DSGVO).</p>
+    <h3>Lokale Speicherung</h3>
+    <p>Ausschlie&szlig;lich deine Zustimmung zu diesen Hinweisen wird lokal in deinem Browser gespeichert (localStorage), damit der Hinweis nicht bei jedem Besuch erscheint. Diese Angabe verl&auml;sst dein Ger&auml;t nicht.</p>
+    <h3>Deine Rechte</h3>
+    <p>Du hast das Recht auf Auskunft, Berichtigung, L&ouml;schung, Einschr&auml;nkung, Daten&uuml;bertragbarkeit und Widerspruch (Art. 15&ndash;21 DSGVO) sowie ein Beschwerderecht bei einer Aufsichtsbeh&ouml;rde.</p>
+    </section>
+<section class="hbsec" id="haftung"><h2>Haftungsausschluss</h2>
+    <p>Alle Inhalte dieses Handbuchs dienen ausschlie&szlig;lich der allgemeinen Information, Bildung und Unterhaltung. Sie stellen ausdr&uuml;cklich <strong>keine Anlageberatung, Anlagevermittlung, Steuer- oder Rechtsberatung</strong> und keine Aufforderung zum Kauf oder Verkauf von Finanzinstrumenten dar.</p>
+    <p>Jede Anlageentscheidung triffst du eigenverantwortlich und auf eigenes Risiko. Kapitalanlagen sind mit Risiken bis hin zum <strong>Totalverlust</strong> verbunden. Vergangene Wertentwicklung ist kein verl&auml;sslicher Indikator f&uuml;r die Zukunft. Genannte Zahlen, Renditen und Steuerregeln sind vereinfacht, k&ouml;nnen sich &auml;ndern und werden ohne Gew&auml;hr angegeben (Stand 2025/2026).</p>
+    <p>Eine Haftung f&uuml;r Sch&auml;den aus der Nutzung oder Nichtnutzbarkeit der Informationen ist &ndash; soweit gesetzlich zul&auml;ssig &ndash; ausgeschlossen. Dies gilt nicht bei Vorsatz oder grober Fahrl&auml;ssigkeit sowie bei Verletzung von Leben, K&ouml;rper oder Gesundheit. Im Zweifel wende dich an eine zugelassene Anlage-, Steuer- oder Rechtsberatung.</p>
+    </section>
+
+    <div id="noresult" class="noresult">Keine Treffer &ndash; versuch ein anderes Stichwort.</div>
+    <div class="footer">
+      &copy; 2026 InvestBlick &middot; Niklas Schulz &middot; Waldstr. 28, 24939 Flensburg &middot; Niklas.ma.schulz@gmail.com<br>
+      <a href="#impressum">Impressum</a> &middot; <a href="#datenschutz">Datenschutz</a> &middot; <a href="#haftung">Haftungsausschluss</a> &middot; <a href="../">InvestBlick-App</a><br>
+      Keine Anlageberatung &middot; Angaben ohne Gew&auml;hr
+    </div>
+  </main>
+</div>
+<button class="totop" id="totop" aria-label="Nach oben">&#8593;</button>
+<script>
+  // Zustimmung
+  (function(){
+    var g=document.getElementById('gate');
+    try{ if(localStorage.getItem('hbConsent')==='1'){ g.style.display='none'; } }catch(e){}
+    var cb=document.getElementById('gc'), bt=document.getElementById('gb');
+    if(cb) cb.addEventListener('change',function(){ bt.disabled=!cb.checked; });
+    if(bt) bt.onclick=function(){ try{localStorage.setItem('hbConsent','1');}catch(e){} g.style.display='none'; };
+  })();
+  // Suche
+  (function(){
+    var inp=document.getElementById('hbSearch');
+    if(!inp) return;
+    var secs=[].slice.call(document.querySelectorAll('.hbsec'));
+    var links=[].slice.call(document.querySelectorAll('#toc a'));
+    var nores=document.getElementById('noresult');
+    inp.addEventListener('input',function(){
+      var q=inp.value.trim().toLowerCase();
+      var any=false;
+      secs.forEach(function(s){
+        var hit = !q || s.textContent.toLowerCase().indexOf(q)>=0;
+        s.style.display = hit?'':'none';
+        if(hit) any=true;
+      });
+      links.forEach(function(a){
+        var id=a.getAttribute('href').slice(1);
+        var t=document.getElementById(id);
+        a.style.display = (!q || (t && t.style.display!=='none'))?'':'none';
+      });
+      if(nores) nores.style.display = any?'none':'block';
+    });
+  })();
+  // Nach oben
+  (function(){var b=document.getElementById('totop');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('show',window.scrollY>500);});b.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};})();
+  // Aktives Kapitel im Inhaltsverzeichnis
+  (function(){var links=[].slice.call(document.querySelectorAll('#toc a'));var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});if(!links.length)return;window.addEventListener('scroll',function(){var y=window.scrollY+150,cur=-1;secs.forEach(function(s,i){if(s&&s.offsetTop<=y)cur=i;});links.forEach(function(a,i){a.classList.toggle('active',i===cur);});});})();
+</script>
+</body></html>

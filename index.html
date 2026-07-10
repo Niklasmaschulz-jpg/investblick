@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>InvestBlick · Sparplan, Dividenden & Live-Charts</title>
+<meta name="description" content="Statistischer Sparplan- und Dividenden-Rechner mit Live-Charts, Risikobewertung und Wahrscheinlichkeiten – verständlich für Einsteiger. Keine Anlageberatung.">
+<meta name="theme-color" content="#0f1720">
+<meta name="author" content="InvestBlick">
+<link rel="canonical" href="https://investblick-nms.netlify.app/">
+<!-- Favicon (inline, kein Extra-Bild nötig) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233ba776'/%3E%3Cpolyline points='12,44 24,34 32,38 44,20 52,14' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='52' cy='14' r='3.5' fill='white'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="InvestBlick">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Teilen-Vorschau (Open Graph / Twitter) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="InvestBlick">
+<meta property="og:title" content="InvestBlick · Sparplan, Dividenden & Live-Charts">
+<meta property="og:description" content="Sparplan durchrechnen, Dividenden verstehen, Aktien & ETFs mit Live-Kursen ansehen – verständlich für Einsteiger.">
+<meta property="og:image" content="https://investblick-nms.netlify.app/share-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://investblick-nms.netlify.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="InvestBlick · Sparplan, Dividenden & Live-Charts">
+<meta name="twitter:description" content="Sparplan durchrechnen, Dividenden verstehen, Aktien & ETFs mit Live-Kursen ansehen.">
+<meta name="twitter:image" content="https://investblick-nms.netlify.app/share-preview.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"InvestBlick","url":"https://investblick-nms.netlify.app/","description":"Statistischer Sparplan- und Dividenden-Rechner mit Live-Charts, Risikobewertung und Wahrscheinlichkeiten - verstaendlich fuer Einsteiger. Keine Anlageberatung.","applicationCategory":"FinanceApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Niklas Schulz"}}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#0f1720;--card:#182430;--card2:#1f2f3d;--line:#2c3e50;--text:#e8eef4;--muted:#93a4b5;
+    --accent:#3ba776;--up:#3ba776;--down:#e0685a;--neutral:#4f9cf0;--invest:#7a8aa0;--gold:#e0b64f;}
+  body.light{--bg:#f3f6f9;--card:#ffffff;--card2:#eef2f6;--line:#d9e1e9;--text:#16202b;--muted:#5b6b7a;
+    --accent:#2f9e6f;--up:#1f8f5f;--down:#c65648;--neutral:#2f74c0;--invest:#8090a0;--gold:#b9891f;}
+  body.light .nav{background:rgba(243,246,249,.92)}
+  body.light .twwrap{background:#f7fafc}
+  *{box-sizing:border-box;margin:0;padding:0}
+  /* Startseite */
+  .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  @media(max-width:680px){.home-grid{grid-template-columns:1fr}}
+  .hcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;cursor:pointer;transition:.15s}
+  .hcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .hcard .hicon{font-size:30px;margin-bottom:8px}
+  .hcard h3{font-size:17px;margin-bottom:6px}
+  .hcard p{font-size:13.5px;color:var(--muted);margin-bottom:12px}
+  .hbtn{color:var(--accent);font-weight:700;font-size:14px}
+  .steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:680px){.steps{grid-template-columns:1fr}}
+  .step{display:flex;gap:12px;align-items:flex-start}
+  .snum{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .themebtn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:8px 12px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .themebtn:hover{border-color:var(--accent)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+  /* Navbar */
+  .nav{position:sticky;top:0;z-index:40;background:rgba(15,23,32,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .navin{max-width:1280px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .brand{font-size:19px;font-weight:800;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+  .brand .logo{background:var(--accent);color:#fff;border-radius:8px;padding:2px 8px;font-size:16px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+  .tab{background:transparent;border:1px solid transparent;color:var(--muted);border-radius:9px;padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .tab:hover{color:var(--text);background:var(--card)}
+  .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .wrap{max-width:1280px;margin:0 auto;padding:22px}
+  .banner{background:rgba(224,182,79,.10);border:1px solid rgba(224,182,79,.35);color:#f0d692;border-radius:10px;padding:11px 14px;font-size:12.5px;margin-bottom:20px}
+  h2.vh{font-size:20px;font-weight:700;margin-bottom:4px}
+  .vsub{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+  .card h2{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type=number],input[type=text]{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:10px 12px;font-size:15px;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .val{font-variant-numeric:tabular-nums;font-weight:600}
+  .layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+  @media(max-width:960px){.layout{grid-template-columns:1fr}}
+  .side{position:sticky;top:76px}
+  .inrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:680px){.inrow{grid-template-columns:1fr}}
+  .view{display:none}.view.active{display:block}
+
+  /* Autocomplete */
+  .ac{position:relative}
+  .aclist{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--line);border-radius:10px;max-height:300px;overflow:auto;z-index:30;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .aclist.show{display:block}
+  .acitem{padding:9px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:14px;border-bottom:1px solid var(--line)}
+  .acitem:last-child{border-bottom:none}
+  .acitem:hover,.acitem.hl{background:var(--card2)}
+  .acitem .nm{font-weight:600}
+  .acitem .mt{font-size:11px;color:var(--muted)}
+  .acitem .sy{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .filters input[type=text]{flex:1;min-width:170px}
+  .chip{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer;white-space:nowrap}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .listwrap{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  table.assets{width:100%;border-collapse:collapse;font-size:13px}
+  table.assets th,table.assets td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+  table.assets th{color:var(--muted);position:sticky;top:0;background:var(--card2);z-index:1;cursor:pointer;user-select:none}
+  table.assets th:first-child,table.assets td:first-child{text-align:left}
+  table.assets tbody tr{cursor:pointer}
+  table.assets tbody tr:hover{background:var(--card2)}
+  table.assets tbody tr.sel{background:rgba(59,167,118,.16);outline:1px solid var(--accent)}
+  table.assets tbody tr.grouphdr{cursor:default}
+  table.assets tbody tr.grouphdr td{background:var(--card2);color:var(--text);font-weight:700;font-size:12.5px;text-align:left;position:sticky;top:33px;border-top:2px solid var(--accent)}
+  table.assets tbody tr.grouphdr:hover td{background:var(--card2)}
+  .tag{font-size:11px;padding:1px 7px;border-radius:6px;background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+  .rc{display:inline-block;min-width:20px;padding:1px 6px;border-radius:6px;color:#fff;font-weight:700;font-size:12px;text-align:center}
+  .dbtn{background:none;border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;white-space:nowrap}
+  .dbtn:hover{background:var(--accent);color:#fff}
+
+  .rgrid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:16px}
+  @media(max-width:760px){.rgrid{grid-template-columns:1fr}}
+  .rbox{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .rbox .t{font-size:12px;color:var(--muted);margin-bottom:8px}.rbox .big{font-size:20px;font-weight:700}
+  .meter{height:10px;border-radius:6px;background:linear-gradient(90deg,#3ba776,#e0b64f,#e0685a);position:relative;margin:12px 0 6px}
+  .meter .pin{position:absolute;top:-4px;width:4px;height:18px;background:#fff;border-radius:2px;transform:translateX(-2px);box-shadow:0 0 4px rgba(0,0,0,.6)}
+  .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+  .prob{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .prob:last-child{border-bottom:none}.prob .pv{font-weight:700;font-variant-numeric:tabular-nums}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  @media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px}
+  .kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:6px}.kpi .num{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}.kpi .pct{font-size:12px;margin-top:4px}
+  .green{color:var(--up)}.blue{color:var(--neutral)}.gray{color:var(--invest)}.goldc{color:var(--gold)}
+  canvas{max-width:100%}
+  table.yr{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  table.yr th,table.yr td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line)}
+  table.yr th{color:var(--muted);position:sticky;top:0;background:var(--card)}
+  table.yr th:first-child,table.yr td:first-child{text-align:left}
+  .yrwrap{max-height:400px;overflow:auto}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .selname{font-size:18px;font-weight:700}.selsub{font-size:12px;color:var(--muted)}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;margin-top:10px}
+  .toggle input{width:16px;height:16px;accent-color:var(--accent)}
+  .sidebtn{width:100%;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:12px}
+  .sidebtn:hover{filter:brightness(1.08)}
+  .qf{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)}
+  .qf:last-child{border-bottom:none}.qf .k{color:var(--muted)}.qf .v{font-weight:600;font-variant-numeric:tabular-nums}
+  .twwrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0;background:#131c26}
+  .chartgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:880px){.chartgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.chartgrid{grid-template-columns:1fr}}
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(6,10,14,.8);display:none;z-index:60;padding:20px;overflow:auto}
+  .modal.open{display:block}
+  .modalinner{max-width:1000px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .mhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+  .closex{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:8px;width:34px;height:34px;font-size:18px;cursor:pointer;flex:none}
+  .expl{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px;margin:14px 0;line-height:1.65}
+  .expl h4{font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px}.expl h4:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  /* Info-Tooltip */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;
+    background:var(--card2);border:1px solid var(--line);color:var(--muted);font-size:10px;font-style:italic;font-weight:800;
+    cursor:help;position:relative;margin-left:5px;vertical-align:middle;line-height:1}
+  .info:hover{border-color:var(--accent);color:var(--accent)}
+  .info:hover::after{content:attr(data-tip);position:absolute;bottom:150%;left:50%;transform:translateX(-50%);
+    background:#0b1219;color:#e8eef4;border:1px solid #2c3e50;border-radius:8px;padding:9px 11px;width:250px;
+    font-size:12px;font-weight:400;font-style:normal;line-height:1.45;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.55);
+    white-space:normal;text-align:left;pointer-events:none}
+  .info.r:hover::after{left:auto;right:0;transform:none}
+  .wlabel{display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--muted);margin:10px 0 4px}
+  .footer{font-size:13px;color:var(--muted);padding:20px;background:var(--card);border:1px solid var(--line);border-radius:12px;line-height:1.7}
+  .footer h3{font-size:15px;color:var(--text);margin:16px 0 6px}.footer h3:first-child{margin-top:0}.footer strong{color:var(--text)}
+  /* Seiten-Footer mit Rechts-Links */
+  .sitefoot{border-top:1px solid var(--line);margin-top:26px;padding:20px 0 10px;color:var(--muted);font-size:13px;text-align:center}
+  .sitefoot a{color:var(--muted);text-decoration:none;margin:0 8px;cursor:pointer}
+  .sitefoot a:hover{color:var(--accent)}
+  .footlinks{margin-bottom:8px}
+  /* Ladebildschirm */
+  #loader{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s ease}
+  #loader.hide{opacity:0;pointer-events:none}
+  .spinner{width:44px;height:44px;border:4px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loadbrand{font-size:22px;font-weight:800;color:var(--text)}
+  /* Sanfte Übergänge zwischen Ansichten */
+  .view.active{animation:fadein .35s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card,.kpi,.hcard{transition:border-color .15s,transform .15s}
+  .sharebtn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:8px 12px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .sharebtn:hover{border-color:var(--accent)}
+  /* ===== Handy-Optimierung (mobile-first Feinschliff) ===== */
+  @media(max-width:640px){
+    .wrap{padding:14px}
+    .navin{padding:10px 12px;gap:8px}
+    .brand{font-size:17px}
+    .tabs{margin-left:0;order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+    .tabs::-webkit-scrollbar{height:0}
+    .tab{padding:7px 11px;font-size:13px;flex:0 0 auto}
+    .themebtn,.sharebtn{padding:7px 10px;font-size:13px}
+    h1{font-size:21px}.vh{font-size:19px}
+    .card{padding:15px}
+    table.assets th,table.assets td{padding:7px 8px;font-size:12px}
+    .listwrap,.yrwrap{overflow:auto}
+    table.yr{min-width:640px}
+    .kpi .num{font-size:19px}
+    .rgrid{gap:12px}
+    .info:hover::after{width:210px;left:auto;right:0;transform:none}
+    .side{position:static}
+  }
+
+  /* ===== Icon-System & Apple/Lean-Feinschliff ===== */
+  .ic{width:1.05em;height:1.05em;flex:none;vertical-align:-.16em}
+  .ic-sm{width:.72em;height:.72em;opacity:.65}
+  .lvldot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;margin-right:4px}
+  body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.011em}
+  h1,.vh,.selname,.kpi .num,.loadbrand,.brand{letter-spacing:-.022em}
+  .tab{display:inline-flex;align-items:center;gap:6px}
+  .brand{display:inline-flex;align-items:center;gap:9px}
+  .brand .logo{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border-radius:9px}
+  .sidebtn,.dbtn,.themebtn,.sharebtn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  .chip{display:inline-flex;align-items:center;gap:5px}
+  .vh{display:flex;align-items:center;gap:9px}
+  .card>h2{display:flex;align-items:center;gap:8px}
+  .card{border-radius:16px}
+  .kpi{border-radius:16px}
+  .banner{border-radius:12px}
+  .sidebtn{border-radius:12px}
+  .dbtn{border-radius:9px}
+  .hcard{border-radius:16px}
+
+  /* ===== Barrierefreiheit (WCAG) ===== */
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px}
+  .info:focus::after,.info:focus-visible::after{content:attr(data-tip);position:absolute;bottom:150%;left:50%;transform:translateX(-50%);background:#0b1219;color:#e8eef4;border:1px solid #2c3e50;border-radius:8px;padding:9px 11px;width:250px;font-size:12px;font-weight:400;line-height:1.45;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.55);text-align:left}
+  .info.r:focus::after,.info.r:focus-visible::after{left:auto;right:0;transform:none}
+  @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+  .twconsent{display:flex;align-items:center;justify-content:center;min-height:180px;height:100%;padding:16px;text-align:center}
+  .twconsent-in{max-width:430px}
+  .twconsent p{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+  .twremember{display:block;margin-top:10px;font-size:12px;color:var(--muted);cursor:pointer}
+  .twremember input{accent-color:var(--accent);margin-right:5px}
+  @media print{
+    .nav,.side,.sitefoot,#cookieBar,#consentGate,#loader,#shareResult,#pdfBtn,.filters,.listwrap,.twwrap,.banner{display:none!important}
+    body{background:#fff}
+    .view{display:none!important}.view.active{display:block!important}
+    .wrap{max-width:100%;padding:0}
+    .card,.kpi,.rbox{background:#fff!important;border-color:#ccc!important}
+    *{color:#111!important;box-shadow:none!important}
+  }
+  details{border-bottom:1px solid var(--line);padding:12px 0}
+  details:last-child{border-bottom:none}
+  details summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;outline-offset:3px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:'+';color:var(--accent);font-weight:800;margin-right:8px}
+  details[open] summary::before{content:'\2013'}
+  details p{color:var(--muted);font-size:14px;margin-top:8px;line-height:1.6}
+  .navgroup{position:relative;display:inline-flex}
+  .groupbtn{background:transparent;border:1px solid transparent;color:var(--muted);border-radius:9px;padding:8px 12px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .groupbtn:hover{color:var(--text);background:var(--card)}
+  .navmenu{position:absolute;top:calc(100% + 6px);left:0;display:none;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:190px;z-index:45;box-shadow:0 12px 30px rgba(0,0,0,.45)}
+  .navgroup.open .navmenu{display:flex}
+  .navmenu .tab{width:100%;justify-content:flex-start}
+  .tabs{overflow:visible}
+  @media(max-width:640px){.tabs{flex-wrap:wrap!important;overflow:visible!important}}
+  .favstar{cursor:pointer;color:#3a4a5a;display:inline-flex;vertical-align:-3px;margin-right:2px}
+  .favstar.on{color:var(--gold)}
+  .favstar:hover{color:var(--gold)}
+  .aibtn{position:fixed;right:20px;bottom:20px;width:60px;height:60px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:72;display:flex;align-items:center;justify-content:center}
+  .aibtn svg{width:28px;height:28px}
+  .aipanel{position:fixed;right:20px;bottom:92px;width:370px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 130px);background:var(--card);border:1px solid var(--line);border-radius:16px;z-index:72;display:none;flex-direction:column;overflow:hidden;box-shadow:0 16px 44px rgba(0,0,0,.55)}
+  .aipanel.open{display:flex}
+  .aihead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);font-size:15px}
+  .aiclose{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:8px;width:30px;height:30px;cursor:pointer}
+  .aimsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .aibubble{max-width:86%;padding:10px 13px;border-radius:12px;font-size:14px;line-height:1.5}
+  .aibubble.bot{background:var(--card2);align-self:flex-start;border-top-left-radius:4px}
+  .aibubble.user{background:var(--accent);color:#fff;align-self:flex-end;border-top-right-radius:4px}
+  .aichips{display:flex;gap:6px;flex-wrap:wrap;padding:8px 14px;max-height:140px;overflow-y:auto;border-top:1px solid var(--line)}
+  .aichip{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:16px;padding:6px 11px;font-size:12.5px;cursor:pointer;text-align:left}
+  .aichip:hover{border-color:var(--accent);color:var(--accent)}
+  .aiinput{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
+  .aiinput input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:9px 12px;font-size:14px}
+  .aisend{background:var(--accent);border:none;color:#fff;border-radius:10px;width:44px;font-size:22px;cursor:pointer}
+  .aidis{font-size:10.5px;color:var(--muted);text-align:center;padding:0 14px 8px}
+  @media(max-width:640px){.aipanel{right:8px;left:8px;width:auto;bottom:84px}.aibtn{right:14px;bottom:14px}}
+</style>
+</head>
+<body>
+<!-- Ladebildschirm -->
+<div id="loader"><div class="spinner"></div><div class="loadbrand"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16l5-5 4 3 8-8"/><path d="M15 6h5v5"/></svg> InvestBlick</div></div>
+
+<!-- Zustimmung zu rechtlichen Hinweisen (Gate) -->
+<div id="consentGate" style="position:fixed;inset:0;background:rgba(6,10,14,.94);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto">
+  <div style="max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px">
+    <div style="font-size:32px;text-align:center"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M6 21h12"/><path d="M3 9l3-5 3 5"/><path d="M15 9l3-5 3 5"/><path d="M3 9a3 3 0 006 0"/><path d="M15 9a3 3 0 006 0"/></svg></div>
+    <h2 style="text-align:center;font-size:20px;margin:8px 0 4px">Bevor es losgeht</h2>
+    <p style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:16px">Bitte kurz lesen und bestätigen.</p>
+    <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13.5px;line-height:1.6;max-height:230px;overflow:auto">
+      <p><strong>Keine Anlageberatung.</strong> Dieses Tool dient nur der Information, Bildung und Unterhaltung. Es stellt keine Anlage-, Finanz-, Steuer- oder Rechtsberatung und keine Kauf-/Verkaufsempfehlung dar.</p>
+      <p style="margin-top:8px">Alle Renditen, Prognosen und Wahrscheinlichkeiten sind statistische Schätzungen ohne Gewähr. Kurs- und Firmendaten stammen von Dritten (TradingView) und können fehlerhaft oder verzögert sein.</p>
+      <p style="margin-top:8px"><strong>Vergangene Wertentwicklung garantiert keine zukünftige.</strong> Investieren birgt Risiken bis zum Totalverlust. Entscheidungen triffst du eigenverantwortlich und auf eigenes Risiko.</p>
+    </div>
+    <label style="display:flex;gap:10px;align-items:flex-start;margin:16px 0;font-size:14px;cursor:pointer">
+      <input type="checkbox" id="consentCheck" style="width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:2px">
+      <span>Ich habe die Hinweise gelesen und verstanden. Mir ist bewusst, dass dies <strong>keine Anlageberatung</strong> ist, und ich nutze das Tool auf eigenes Risiko.</span>
+    </label>
+    <button id="consentBtn" class="sidebtn" style="margin-top:0;opacity:.5;cursor:not-allowed" disabled>Akzeptieren &amp; starten</button>
+    <div style="text-align:center;margin-top:8px"><a href="#" id="consentLegal" style="color:var(--muted);font-size:12px">Vollständige rechtliche Hinweise ansehen</a></div>
+  </div>
+</div>
+
+<!-- Cookie-Hinweis -->
+<div id="cookieBar" style="position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--card);border-top:1px solid var(--line);padding:14px 18px;display:none">
+  <div style="max-width:1000px;margin:0 auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px;font-size:13px;color:var(--muted)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 109 9 3 3 0 01-3-3 3 3 0 01-3-3 9 9 0 00-3-3z"/><circle cx="9.5" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="13" cy="15" r=".9" fill="currentColor" stroke="none"/><circle cx="15" cy="9.5" r=".9" fill="currentColor" stroke="none"/></svg> Diese Seite bindet Inhalte von <strong>TradingView</strong> (Live-Charts) ein. Dabei können Cookies bzw. ähnliche Technologien von Drittanbietern gesetzt werden. Notwendige Cookies sind für die Grundfunktion nötig; alle weiteren nur mit deiner Einwilligung.</div>
+    <button class="dbtn" id="cookieNecessary" style="padding:9px 14px;font-size:13px">Nur notwendige</button>
+    <button class="sidebtn" id="cookieAll" style="width:auto;margin:0;padding:9px 18px">Alle akzeptieren</button>
+  </div>
+</div>
+
+<!-- Geführter Einstieg -->
+<div id="onboard" style="position:fixed;inset:0;background:rgba(6,10,14,.9);z-index:95;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:520px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px">
+    <h2 style="font-size:20px;margin-bottom:4px">Willkommen bei InvestBlick</h2>
+    <p class="selsub" style="margin-bottom:14px">In 3 Schritten zum Ergebnis:</p>
+    <div class="step"><div class="snum">1</div><div><strong>Wert w&auml;hlen</strong><br><span class="selsub">ETF oder Aktie ausw&auml;hlen &ndash; oder in der Suche jeden Wert finden.</span></div></div>
+    <div class="step" style="margin-top:12px"><div class="snum">2</div><div><strong>Sparrate eingeben</strong><br><span class="selsub">Monatsbetrag &amp; Laufzeit festlegen &ndash; der Rest rechnet automatisch.</span></div></div>
+    <div class="step" style="margin-top:12px"><div class="snum">3</div><div><strong>Ergebnis &amp; Risiko sehen</strong><br><span class="selsub">Prognose, Dividenden, Risiko und Wahrscheinlichkeiten auf einen Blick.</span></div></div>
+    <button class="sidebtn" id="onboardStart" style="margin-top:18px">Los geht&#39;s</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<div class="nav"><div class="navin">
+  <div class="brand"><span class="logo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16l5-5 4 3 8-8"/><path d="M15 6h5v5"/></svg></span> InvestBlick</div>
+  <div class="tabs">
+    <button class="tab active" data-v="start"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg> Start</button>
+    <button class="tab" data-v="rechner" data-base="ETF"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> ETFs</button>
+    <button class="tab" data-v="rechner" data-base="Aktie"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 011-1h9a1 1 0 011 1v15"/><path d="M16 20V9h2a1 1 0 011 1v10"/><path d="M4 20h16"/><path d="M8 7h2M8 11h2M8 15h2"/></svg> Aktien</button>
+    <div class="navgroup"><button class="groupbtn" type="button"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a1 1 0 011-1h4l2 2h7a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1z"/></svg> Rechner <span style="font-size:10px">&#9662;</span></button>
+      <div class="navmenu">
+        <button class="tab" data-v="portfolio"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a1 1 0 011-1h4l2 2h7a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1z"/></svg> Portfolio</button>
+        <button class="tab" data-v="ziel"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h12l-2.5 3.5L17 11H5"/></svg> Ziel-Rechner</button>
+        <button class="tab" data-v="entnahme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14" r="1.1" fill="currentColor"/></svg> Entnahmeplan</button>
+        <button class="tab" data-v="vergleich"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M7 8l-3 3 3 3"/><path d="M17 8l3 3-3 3"/></svg> Vergleich</button>
+        <button class="tab" data-v="empf"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg> Beispiele</button>
+      </div></div>
+    <div class="navgroup"><button class="groupbtn" type="button"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16l5-5 4 3 8-8"/><path d="M15 6h5v5"/></svg> Entdecken <span style="font-size:10px">&#9662;</span></button>
+      <div class="navmenu">
+        <button class="tab" data-v="charts"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16l5-5 4 3 8-8"/><path d="M15 6h5v5"/></svg> Live-Charts</button>
+        <button class="tab" data-v="suche"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> Aktien-Suche</button>
+        <button class="tab" data-v="faq"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 013.5 2c0 1.5-2 1.7-2 3"/><path d="M12 17h.01"/></svg> Ratgeber</button>
+        <button class="tab" data-v="legal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M6 21h12"/><path d="M3 9l3-5 3 5"/><path d="M15 9l3-5 3 5"/><path d="M3 9a3 3 0 006 0"/><path d="M15 9a3 3 0 006 0"/></svg> Rechtliches</button>
+      </div></div>
+  </div>
+  <button class="themebtn" id="dataBtn" title="Rechengrundlage umschalten: historischer Durchschnitt oder aktuelle Experten-Renditeerwartung (Capital Market Assumptions 2026: J.P. Morgan, Vanguard, BlackRock, Morningstar)">Daten: Historisch</button>
+  <button class="sharebtn" id="shareBtn" title="Seite teilen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 005.66 0l3-3a4 4 0 10-5.66-5.66l-1.5 1.5"/><path d="M14 10a4 4 0 00-5.66 0l-3 3a4 4 0 105.66 5.66l1.5-1.5"/></svg> Teilen</button>
+  <button class="themebtn" id="themeBtn" title="Hell/Dunkel umschalten"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8 8 0 1111.2 3a6.5 6.5 0 009.8 9.8z"/></svg> Dunkel</button>
+</div></div>
+
+<div class="wrap">
+  <div class="banner"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg> <strong>Keine Anlageberatung.</strong> Nur Information/Bildung. Alle Zahlen sind statistische Schätzungen bzw. Daten Dritter ohne Gewähr. Rechtliche Hinweise im Tab „Rechtliches". Kauf/Verkauf auf eigenes Risiko.</div>
+
+  <!-- ============ VIEW: START ============ -->
+  <section class="view active" id="view-start">
+    <div style="text-align:center;padding:18px 0 6px">
+      <div style="font-size:44px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16l5-5 4 3 8-8"/><path d="M15 6h5v5"/></svg></div>
+      <h2 style="font-size:30px;font-weight:800;margin:6px 0">Willkommen bei InvestBlick</h2>
+      <p style="color:var(--muted);font-size:16px;max-width:640px;margin:0 auto">Verständlich für Einsteiger: Sparpläne durchrechnen, Dividenden verstehen und Aktien &amp; ETFs mit Live-Kursen ansehen – alles an einem Ort.</p><p style="margin-top:14px"><button class="dbtn" id="openOnboard" style="padding:9px 18px;font-size:14px">Erste Schritte ansehen</button></p>
+    </div>
+    <div class="home-grid">
+      <div role="button" tabindex="0" class="hcard" data-go="rechner" data-base="ETF">
+        <div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg></div>
+        <h3>ETF-Sparplan berechnen</h3>
+        <p>ETFs bündeln viele Firmen in einem Papier – breit gestreut und für den Anfang oft ruhiger. Sparrate eingeben und sehen, wie dein Geld mit Zinseszins wächst.</p>
+        <span class="hbtn">ETFs berechnen <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+      <div role="button" tabindex="0" class="hcard" data-go="rechner" data-base="Aktie">
+        <div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 011-1h9a1 1 0 011 1v15"/><path d="M16 20V9h2a1 1 0 011 1v10"/><path d="M4 20h16"/><path d="M8 7h2M8 11h2M8 15h2"/></svg></div>
+        <h3>Aktien-Sparplan berechnen</h3>
+        <p>Einzelne Firmen – mehr Chance, aber auch mehr Risiko. Mit Dividenden, Risikoklasse und Wahrscheinlichkeiten je Aktie.</p>
+        <span class="hbtn">Aktien berechnen <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+      <div role="button" tabindex="0" class="hcard" data-go="charts">
+        <div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg></div>
+        <h3>Live-Charts</h3>
+        <p>Aktuelle Kurse großer Märkte wie S&amp;P 500, DAX oder MSCI World – einfach als Linie dargestellt, mit kurzer Erklärung, wie man einen Chart liest.</p>
+        <span class="hbtn">Charts ansehen <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+      <div role="button" tabindex="0" class="hcard" data-go="suche">
+        <div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>
+        <h3>Aktien-Suche</h3>
+        <p>Finde praktisch jede Aktie und jeden ETF weltweit. Tippen genügt – es erscheinen Vorschläge, dazu Live-Chart, Firmenprofil und eine einfache Einschätzung.</p>
+        <span class="hbtn">Wert suchen <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+      <a class="hcard" href="investblicknmsetf/" style="text-decoration:none;color:inherit;display:block"><div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 011-1h13v18H6a1 1 0 00-1 1z"/><path d="M19 3v18"/><path d="M8 7h7M8 11h7"/></svg></div><h3>ETF-Handbuch</h3><p>Alles &uuml;ber ETFs f&uuml;r Einsteiger &ndash; zum Nachschlagen, mit Suche und Themen-&Uuml;bersicht.</p><span class="hbtn">Handbuch &ouml;ffnen &rsaquo;</span></a>
+      <a class="hcard" href="investblicknmsaktien/" style="text-decoration:none;color:inherit;display:block"><div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 011-1h13v18H6a1 1 0 00-1 1z"/><path d="M19 3v18"/><path d="M8 7h7M8 11h7"/></svg></div><h3>Aktien-Handbuch</h3><p>Alles &uuml;ber Aktien f&uuml;r Einsteiger &ndash; Grundlagen, Kennzahlen, Risiko, Steuern, Strategie.</p><span class="hbtn">Handbuch &ouml;ffnen &rsaquo;</span></a>
+      <div role="button" tabindex="0" class="hcard" data-go="faq"><div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 013.5 2c0 1.5-2 1.7-2 3"/><path d="M12 17h.01"/></svg></div><h3>Ratgeber &amp; FAQ</h3><p>Die wichtigsten Begriffe und Fragen f&uuml;r Einsteiger &ndash; kurz und einfach erkl&auml;rt.</p><span class="hbtn">Fragen ansehen &rsaquo;</span></div>
+      <div role="button" tabindex="0" class="hcard" data-go="legal">
+        <div class="hicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M6 21h12"/><path d="M3 9l3-5 3 5"/><path d="M15 9l3-5 3 5"/><path d="M3 9a3 3 0 006 0"/><path d="M15 9a3 3 0 006 0"/></svg></div>
+        <h3>Rechtliches</h3>
+        <p>Wichtig: Dies ist keine Anlageberatung, sondern nur Information. Hier findest du den vollständigen Haftungsausschluss und alle Hinweise.</p>
+        <span class="hbtn">Hinweise lesen <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <h2>So funktioniert's – in 3 Schritten</h2>
+      <div class="steps">
+        <div class="step"><div class="snum">1</div><div><strong>Wert wählen</strong><br><span class="selsub">ETF oder Aktie aus der Liste anklicken oder in der Suche finden.</span></div></div>
+        <div class="step"><div class="snum">2</div><div><strong>Sparrate eingeben</strong><br><span class="selsub">Monatsbetrag und Laufzeit festlegen – der Rest wird automatisch berechnet.</span></div></div>
+        <div class="step"><div class="snum">3</div><div><strong>Ergebnis &amp; Risiko sehen</strong><br><span class="selsub">Prognose, Dividenden, Risikoklasse und Wahrscheinlichkeiten auf einen Blick.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: RECHNER ============ -->
+  <section class="view" id="view-rechner">
+    <div class="layout">
+      <div class="main">
+        <div class="card">
+          <h2 id="listHead"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> ETFs auswählen</h2>
+          <div class="selsub" style="margin-bottom:8px" id="listSub">Nur ETFs – breit gestreut. Für Einzelaktien oben auf „<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 011-1h9a1 1 0 011 1v15"/><path d="M16 20V9h2a1 1 0 011 1v10"/><path d="M4 20h16"/><path d="M8 7h2M8 11h2M8 15h2"/></svg> Aktien" wechseln.</div>
+          <div class="filters">
+            <input type="text" id="search" placeholder="<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> In dieser Liste suchen …">
+            <span role="button" tabindex="0" class="chip active" data-f="all">Alle</span>
+            <span role="button" tabindex="0" class="chip" data-f="div">Dividende ≥3 %</span>
+            <span role="button" tabindex="0" class="chip" data-f="sicher">Defensiv</span>
+            <span role="button" tabindex="0" class="chip" data-f="fav">★ Favoriten</span>
+          </div>
+          <div class="listwrap">
+            <table class="assets"><thead><tr>
+              <th data-s="name">Name</th><th data-s="type">Typ</th><th data-s="mean">Ø Rendite <span class="info" data-tip="Durchschnittlicher Wertzuwachs pro Jahr (langfristiger historischer Mittelwert, inkl. Dividenden). Nur ein Mittelwert – einzelne Jahre können stark abweichen.">i</span></th>
+              <th data-s="div">Dividende <span class="info" data-tip="Anteil, der jährlich als Gewinn ausgeschüttet wird, in % vom Kurs.">i</span></th><th data-s="vol">Schwankung <span class="info" data-tip="Volatilität: wie stark der Kurs typischerweise schwankt. Höher = größere Ausschläge nach oben und unten.">i</span></th><th data-s="rc">Risiko <span class="info r" data-tip="Risikoklasse 1–7 (EU-Standard), berechnet aus der Schwankung. 1 = sehr sicher, 7 = sehr spekulativ.">i</span></th><th></th>
+            </tr></thead><tbody id="assetBody"></tbody></table>
+          </div>
+          <div class="selsub" style="margin-top:8px">Zeile anklicken = für Sparplan nutzen. „Details" öffnet Live-Chart &amp; Erklärungen.</div>
+        </div>
+
+        <div class="card">
+          <h2>2 · Dein Sparplan</h2>
+          <div class="inrow">
+            <div><label>Monatliche Sparrate (€)</label><input type="number" id="rate" value="200" min="0" step="10"></div>
+            <div><label>Startkapital (€)</label><input type="number" id="start" value="0" min="0" step="100"></div>
+            <div><label>Laufzeit: <span id="yearsLbl" class="val">20</span> Jahre</label><input type="range" id="years" min="1" max="50" value="20" style="margin-top:12px"></div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="infl"> Inflationsbereinigt (2 % p.a. Kaufkraft) <span class="info" data-tip="Zeigt den Wert in heutiger Kaufkraft: rechnet die Geldentwertung (2 %/Jahr) heraus. So siehst du, was das Geld später wirklich wert ist.">i</span></label>
+          <label class="toggle"><input type="checkbox" id="reinvest" checked> Dividenden reinvestieren (Zinseszins) <span class="info" data-tip="Ausgeschüttete Dividenden werden sofort wieder angelegt. Dadurch verdienst du auch auf die Dividenden – der Zinseszins-Effekt, über viele Jahre der stärkste Hebel.">i</span></label>
+          <label class="toggle"><input type="checkbox" id="tax"> Nach Steuern &amp; Kosten (DE) <span class="info" data-tip="Rechnet vereinfacht: laufende ETF-Kosten (TER) mindern die Rendite, und auf den Gewinn wird die deutsche Abgeltungssteuer (26,375 %) abzüglich 1.000 € Sparerpauschbetrag abgezogen. Vereinfachtes Modell, keine Steuerberatung.">i</span></label>
+          <label class="toggle"><input type="checkbox" id="dyn"> Sparrate j&auml;hrlich erh&ouml;hen um <input type="number" id="dynPct" value="3" min="0" max="20" step="0.5" style="width:58px;display:inline-block;padding:4px 6px" aria-label="Jährliche Erhöhung der Sparrate in Prozent"> %</label>
+          <label style="margin-top:12px">Vergleich Tagesgeld-Zins (%)</label>
+          <input type="number" id="tgRate" value="2" min="0" max="10" step="0.1" style="max-width:120px" aria-label="Tagesgeld-Zins in Prozent">
+          <div class="selsub" style="margin-top:10px">Rendite und Bandbreite berechnet das System selbst (80 %-Konfidenzintervall).</div>
+        </div>
+
+        <div class="card">
+          <div class="selname" id="selName">–</div>
+          <div class="selsub" id="selSub" style="margin-bottom:16px">–</div>
+          <div class="rgrid">
+            <div class="rbox">
+              <div class="t">Risikoklasse (aus Schwankung, EU-Standard 1–7) <span class="info" data-tip="Standard-Risikomaß der EU von 1 (sehr sicher) bis 7 (sehr spekulativ). Wird aus der Kursschwankung berechnet: je stärker der Kurs schwankt, desto höher die Klasse.">i</span></div>
+              <div class="big" id="rClass">–</div>
+              <div class="meter"><div class="pin" id="rPin" style="left:50%"></div></div>
+              <div class="scale"><span>1 sicher</span><span>4 mittel</span><span>7 spekulativ</span></div>
+            </div>
+            <div class="rbox">
+              <div class="t">Wahrscheinlichkeiten über die Laufzeit <span class="info" data-tip="Statistische Schätzung auf Basis der historischen Durchschnittsrendite und Schwankung – keine Vorhersage. Je länger die Laufzeit, desto sicherer wird das Ergebnis tendenziell.">i</span></div>
+              <div class="prob"><span>Verlust (unter Einzahlung) <span class="info" data-tip="Geschätzte Chance, dass dein Depot am Ende weniger wert ist als das, was du eingezahlt hast.">i</span></span><span class="pv" id="pLoss">–</span></div>
+              <div class="prob"><span>Inflation geschlagen <span class="info" data-tip="Chance, dass deine Rendite die Geldentwertung (hier 2 %/Jahr) übertrifft – also deine Kaufkraft wächst.">i</span></span><span class="pv" id="pInfl">–</span></div>
+              <div class="prob"><span>Geld verdoppelt <span class="info" data-tip="Geschätzte Chance, dass am Ende mindestens doppelt so viel im Depot ist wie eingezahlt.">i</span></span><span class="pv" id="pDouble">–</span></div>
+            </div>
+            <div class="rbox">
+              <div class="t">Dividenden-Ertrag <span class="info" data-tip="Dividende = regelmäßige Gewinn-Ausschüttung. Hier: geschätzte Auszahlung, wenn du am Ende der Laufzeit den Depotwert hältst.">i</span></div>
+              <div class="prob"><span>Dividende / Jahr am Ende</span><span class="pv goldc" id="dYear">–</span></div>
+              <div class="prob"><span>Dividenden gesamt</span><span class="pv goldc" id="dTotal">–</span></div>
+              <div class="prob"><span>Ø Monatsdividende am Ende</span><span class="pv goldc" id="dMonth">–</span></div>
+              <div class="prob" style="border-top:1px dashed var(--line);margin-top:4px;padding-top:8px"><span>Ø Weltmarkt zum Vergleich <span class="info r" data-tip="Typische Dividendenrendite als Orientierung: breiter Weltmarkt (MSCI World) ca. 1,8 %/Jahr, breite US-Werte (S&P 500) aktuell nur ~1,1 %. Dividenden-ETFs liegen bei ~3–4 %, dividendenstarke Einzelaktien bei ~3–6 %.">i</span></span><span class="pv">~1,8 %</span></div>
+              <div class="prob"><span>Einordnung dieses Werts</span><span class="pv" id="dRank">–</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="lbl">Eingezahlt gesamt</div><div class="num gray" id="kInvest">–</div><div class="pct gray">Deine Sparraten</div></div>
+          <div class="kpi"><div class="lbl">Endwert (erwartet)</div><div class="num blue" id="kValue">–</div><div class="pct blue" id="kValuePct">–</div></div>
+          <div class="kpi"><div class="lbl">Gewinn</div><div class="num green" id="kGain">–</div><div class="pct green" id="kGainPct">–</div></div>
+          <div class="kpi"><div class="lbl">Erwartete Rendite p.a. <span class="info r" data-tip="Vom System genutzte Jahresrendite für die Prognose – der langfristige historische Durchschnitt des gewählten Werts. Keine Garantie.">i</span></div><div class="num blue" id="kRet">–</div><div class="pct blue" id="kRetSub">statistisch</div></div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px"><button class="dbtn" id="shareResult" style="padding:9px 16px;font-size:13px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 005.66 0l3-3a4 4 0 10-5.66-5.66l-1.5 1.5"/><path d="M14 10a4 4 0 00-5.66 0l-3 3a4 4 0 105.66 5.66l1.5-1.5"/></svg> Ergebnis-Link kopieren</button><button class="dbtn" id="imgBtn" style="padding:9px 16px;font-size:13px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M4 17l5-4 4 3 3-2 4 3"/></svg> Als Bild speichern</button>
+        <button class="dbtn" id="pdfBtn" style="padding:9px 16px;font-size:13px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="M8 11l4 4 4-4"/><path d="M5 20h14"/></svg> Als PDF speichern</button></div>
+        <div class="card"><h2>Entwicklung über die Jahre</h2>
+          <canvas id="chart" height="150"></canvas>
+          <div class="selsub" id="tgNote" style="margin-top:10px"></div>
+          <div class="legend">
+            <span><span class="dot" style="background:#7a8aa0"></span>Eingezahlt</span>
+            <span><span class="dot" style="background:#e0685a"></span>Pessimistisch</span>
+            <span><span class="dot" style="background:#4f9cf0"></span>Erwartet</span>
+            <span><span class="dot" style="background:#3ba776"></span>Optimistisch</span>
+          </div>
+        </div>
+
+        <div class="card"><h2>Monte-Carlo-Simulation <span class="info" data-tip="500 zuf&auml;llige Verl&auml;ufe auf Basis von Rendite und Schwankung. Zeigt, wie unterschiedlich es real ausgehen kann &ndash; statt nur einer Zahl. Zufallsmodell, keine Vorhersage.">i</span></h2><div class="rgrid"><div class="rbox"><div class="t">Schwacher Verlauf<br><span class="selsub">10 % der F&auml;lle darunter</span></div><div class="big" id="mcP10" style="color:var(--down)">&ndash;</div></div><div class="rbox"><div class="t">Mittlerer Verlauf<br><span class="selsub">Median</span></div><div class="big" id="mcP50" style="color:var(--neutral)">&ndash;</div></div><div class="rbox"><div class="t">Starker Verlauf<br><span class="selsub">10 % der F&auml;lle dar&uuml;ber</span></div><div class="big" id="mcP90" style="color:var(--up)">&ndash;</div></div></div><div class="selsub" style="margin-top:12px">In <strong id="mcPos">&ndash;</strong> der 500 Simulationen endest du &uuml;ber deiner Einzahlung.</div></div>
+        <div class="card"><h2>Jahr-für-Jahr (erwartetes Szenario)</h2>
+          <div class="yrwrap"><table class="yr" id="tbl">
+            <thead><tr><th>Jahr</th><th>Eingezahlt</th><th>Depotwert</th><th>Gewinn (€)</th><th>Gewinn (%)</th><th>Dividende/Jahr</th><th>Pessim.</th><th>Optim.</th></tr></thead>
+            <tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="card">
+          <h2>Live-Kurs · <span id="liveName" style="text-transform:none;color:var(--text)">–</span></h2>
+          <div class="twwrap" id="miniChart" style="height:230px"></div>
+          <div id="quickFacts"></div>
+          <button class="sidebtn" id="openDetail"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> Alle Details &amp; Live-Daten</button>
+          <div class="selsub" style="margin-top:8px;text-align:center">Live-Kurse via TradingView · benötigt Internet</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: LIVE-CHARTS ============ -->
+  <section class="view" id="view-charts">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> Live-Charts</h2>
+    <p class="vsub">Einfach dargestellt: heutige Top-Mover, große Märkte zum Umschalten und einzelne Werte auf einen Blick.</p>
+
+    <div class="card">
+      <div class="wlabel" style="font-size:15px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3 4 4 4 8a4 4 0 11-8 0c0-1.5.5-2.5 1-3 .3 1 .8 1.5 1.5 1.5C11 7 11 5 12 3z"/></svg> Top-Mover heute – größte Gewinner &amp; Verlierer <span class="info" data-tip="Wie bei Trade Republic: Aktien mit der stärksten Kursbewegung heute. „Gainers" = größte Gewinner, „Losers" = größte Verlierer, „Active" = am meisten gehandelt. Live von der US-Börse.">i</span></div>
+      <div class="twwrap" id="topMovers" style="height:430px;margin:0"></div>
+    </div>
+
+    <div class="card">
+      <div class="wlabel" style="font-size:15px">Große Märkte – oben umschalten <span class="info" data-tip="Klicke oben auf einen Markt (S&P 500, DAX, MSCI World …). Die Linie zeigt den Kurs über die Zeit: hoch = gestiegen, runter = gefallen. Der große Preis oben ist der aktuelle Stand.">i</span></div>
+      <div class="twwrap" id="bigChart" style="height:420px;margin:0"></div>
+    </div>
+
+    <h2 class="vh" style="font-size:16px">Einzelne Märkte im Überblick</h2>
+    <div class="chartgrid" id="chartGrid"></div>
+  </section>
+
+  <!-- ============ VIEW: SUCHE ============ -->
+  <section class="view" id="view-suche">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> Aktien-Suche</h2>
+    <p class="vsub">Praktisch jede Aktie und jeden ETF weltweit finden – mit Live-Chart, Profil &amp; Kennzahlen. Tippe einen Namen oder ein Kürzel, es erscheinen Vorschläge.</p>
+    <div class="card">
+      <label>Name oder Ticker eingeben</label>
+      <div class="ac">
+        <input type="text" id="bigSearch" placeholder="z. B. Apple, SAP, NVDA, Amazon, VUSA …" autocomplete="off">
+        <div class="aclist" id="bigAc"></div>
+      </div>
+      <div class="selsub" style="margin-top:8px">Vorschläge kommen aus einer Liste bekannter Werte. Du kannst auch ein reines Kürzel (z. B. <code>MSFT</code> oder <code>XETR:SAP</code>) eingeben und Enter drücken.</div>
+    </div>
+    <div id="searchResult"></div>
+  </section>
+
+  <!-- ============ VIEW: LEGAL ============ -->
+  <section class="view" id="view-legal">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M6 21h12"/><path d="M3 9l3-5 3 5"/><path d="M15 9l3-5 3 5"/><path d="M3 9a3 3 0 006 0"/><path d="M15 9a3 3 0 006 0"/></svg> Rechtliche Hinweise &amp; Haftungsausschluss</h2>
+    <div class="footer">
+      <h3>Keine Anlageberatung / keine Anlagevermittlung</h3>
+      <p>Die auf dieser Seite bereitgestellten Inhalte, Berechnungen, Kennzahlen, Wahrscheinlichkeiten und Darstellungen dienen ausschließlich der allgemeinen Information sowie zu Bildungs- und Unterhaltungszwecken. Sie stellen ausdrücklich <strong>keine Anlageberatung, Anlagevermittlung, Finanz-, Steuer- oder Rechtsberatung</strong> und keine Aufforderung oder Empfehlung zum Kauf, Verkauf oder Halten von Wertpapieren oder sonstigen Finanzinstrumenten im Sinne des Wertpapierhandelsgesetzes (WpHG) oder vergleichbarer Vorschriften dar. Es kommt kein Beratungs- oder Auskunftsvertrag zustande.</p>
+      <h3>Eigenverantwortung</h3>
+      <p>Jede Anlageentscheidung treffen Sie eigenverantwortlich und auf eigenes Risiko. Vor einer Anlageentscheidung sollten Sie sich unabhängig beraten lassen (z. B. durch eine zugelassene Anlageberatung, einen Steuerberater und/oder Rechtsanwalt) und die offiziellen Produktunterlagen (Basisinformationsblatt/KID, Prospekt) prüfen.</p>
+      <h3>Keine Gewähr für Richtigkeit und Aktualität</h3>
+      <p>Historische Renditen, Schwankungen (Volatilität) und Dividendenrenditen sind vereinfachte, langfristige Näherungswerte bzw. Schätzungen und können von den tatsächlichen Werten abweichen. Live-Kursdaten stammen von Drittanbietern (TradingView), werden ohne Gewähr dargestellt und können verzögert sein. Für Richtigkeit, Vollständigkeit und Aktualität sämtlicher Angaben wird <strong>keine Haftung</strong> übernommen.</p>
+      <h3>Wesen der Prognosen</h3>
+      <p>Sämtliche Zukunftswerte sind rein modellhafte, statistische Hochrechnungen auf Basis historischer Durchschnittswerte und eines Normalverteilungsmodells. <strong>Die vergangene Wertentwicklung ist kein verlässlicher Indikator für die zukünftige Wertentwicklung.</strong> Tatsächliche Ergebnisse können erheblich – auch negativ – abweichen. Kapitalanlagen sind mit Risiken bis hin zum <strong>Totalverlust</strong> verbunden. Einzelaktien tragen ein deutlich höheres Risiko (Klumpenrisiko) als breit gestreute Fonds/ETFs.</p>
+      <h3>Haftungsausschluss</h3>
+      <p>Eine Haftung für Vermögensschäden oder sonstige Schäden, die aus der Nutzung oder Nichtnutzbarkeit der bereitgestellten Informationen bzw. aus dem Vertrauen auf deren Richtigkeit entstehen, ist – soweit gesetzlich zulässig – ausgeschlossen. Dies gilt nicht bei Vorsatz oder grober Fahrlässigkeit sowie bei Verletzung von Leben, Körper oder Gesundheit.</p>
+      <p style="margin-top:10px;color:#6f8093">Kurs-, Fundamental- und Chartdaten werden über die frei einbindbaren Widgets von TradingView bereitgestellt. Marken- und Produktnamen sind Eigentum der jeweiligen Rechteinhaber.</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: PORTFOLIO ============ -->
+  <section class="view" id="view-portfolio">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a1 1 0 011-1h4l2 2h7a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1z"/></svg> Mein Portfolio – mehrere Werte kombinieren</h2>
+    <p class="vsub">Füge mehrere Aktien/ETFs mit je einem Monatsbetrag hinzu (z. B. 100 € Apple + 100 € Nvidia + 100 € KI-ETF). Alles wird zusammen gerechnet. Du kannst dein Portfolio speichern.</p>
+
+    <div class="card">
+      <h2>Wert hinzufügen</h2>
+      <div class="ac">
+        <input type="text" id="pSearch" placeholder="<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> Wert suchen (z. B. Apple, Nvidia, MSCI World, KI/AI …)" autocomplete="off">
+        <div class="aclist" id="pAc"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap">
+        <span class="selsub">Ausgewählt: <strong id="pPick" style="color:var(--text)">– bitte oben suchen –</strong></span>
+        <label style="margin:0">Betrag: <input type="number" id="pAmt" value="100" min="0" step="10" style="width:110px;display:inline-block"> € / Monat</label>
+        <button class="dbtn" id="pAdd" style="padding:9px 16px;font-size:13px">+ Hinzufügen</button>
+      </div>
+      <div class="selsub" style="margin-top:6px">Nicht in der Liste? Tippe ein beliebiges Kürzel und Enter – der Wert wird als Einzelaktie mit geschätzten Kennzahlen (≈) hinzugefügt.</div>
+    </div>
+
+    <div class="card">
+      <h2>Deine Positionen</h2>
+      <div class="listwrap" style="max-height:none">
+        <table class="assets"><thead><tr><th>Wert</th><th>€/Monat</th><th>Anteil</th><th>Ø Rendite</th><th>Div.</th><th>Risiko</th><th></th></tr></thead><tbody id="pBody"></tbody></table>
+      </div>
+      <div class="inrow" style="margin-top:14px">
+        <div><label>Laufzeit: <span id="pYearsLbl" class="val">20</span> Jahre</label><input type="range" id="pYears" min="1" max="50" value="20" style="margin-top:12px"></div>
+        <div><label>Startkapital gesamt (€)</label><input type="number" id="pStart" value="0" min="0" step="100"></div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end">
+          <label class="toggle" style="margin-top:0"><input type="checkbox" id="pReinvest" checked> Dividenden reinvestieren</label>
+          <label class="toggle"><input type="checkbox" id="pInfl"> Inflationsbereinigt</label>
+          <label class="toggle"><input type="checkbox" id="pTax"> Nach Steuern &amp; Kosten (DE)</label>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="pName" placeholder="Portfolio-Name (z. B. Mein Mix)" style="max-width:220px">
+        <button class="dbtn" id="pSave" style="padding:9px 16px;font-size:13px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7"/><path d="M8 20v-6h8v6"/></svg> Speichern</button>
+        <button class="dbtn" id="pClear" style="padding:9px 16px;font-size:13px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 13h10l1-13"/></svg> Alle entfernen</button>
+      </div>
+      <div id="pSaved" style="margin-top:14px"></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="lbl">Sparrate gesamt</div><div class="num gray" id="pkRate">–</div><div class="pct gray">pro Monat</div></div>
+      <div class="kpi"><div class="lbl">Eingezahlt gesamt</div><div class="num gray" id="pkInvest">–</div><div class="pct gray" id="pkInvestSub">–</div></div>
+      <div class="kpi"><div class="lbl">Endwert (erwartet)</div><div class="num blue" id="pkValue">–</div><div class="pct blue" id="pkValueSub">–</div></div>
+      <div class="kpi"><div class="lbl">Gewinn</div><div class="num green" id="pkGain">–</div><div class="pct green" id="pkGainSub">–</div></div>
+    </div>
+
+    <div class="card">
+      <div class="selname">Gesamt-Portfolio</div>
+      <div class="selsub" id="pCombSub" style="margin-bottom:16px">–</div>
+      <div class="rgrid">
+        <div class="rbox">
+          <div class="t">Risikoklasse (gemischt) <span class="info" data-tip="Risiko des Gesamtportfolios, aus den gewichteten Schwankungen der Positionen. Mischen mehrerer Werte senkt das Risiko etwas (Streuung).">i</span></div>
+          <div class="big" id="prClass">–</div>
+          <div class="meter"><div class="pin" id="prPin" style="left:50%"></div></div>
+          <div class="scale"><span>1 sicher</span><span>4 mittel</span><span>7 spekulativ</span></div>
+        </div>
+        <div class="rbox">
+          <div class="t">Wahrscheinlichkeiten</div>
+          <div class="prob"><span>Verlust (unter Einzahlung)</span><span class="pv" id="ppLoss">–</span></div>
+          <div class="prob"><span>Inflation geschlagen</span><span class="pv" id="ppInfl">–</span></div>
+          <div class="prob"><span>Geld verdoppelt</span><span class="pv" id="ppDouble">–</span></div>
+        </div>
+        <div class="rbox">
+          <div class="t">Dividenden-Ertrag gesamt</div>
+          <div class="prob"><span>Dividende / Jahr am Ende</span><span class="pv goldc" id="pdYear">–</span></div>
+          <div class="prob"><span>Ø Monatsdividende am Ende</span><span class="pv goldc" id="pdMonth">–</span></div>
+          <div class="prob"><span>Ø Dividende Portfolio</span><span class="pv goldc" id="pdAvg">–</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card"><h2>Entwicklung des Gesamt-Portfolios</h2>
+      <canvas id="pChart" height="150"></canvas>
+      <div class="legend">
+        <span><span class="dot" style="background:#7a8aa0"></span>Eingezahlt</span>
+        <span><span class="dot" style="background:#e0685a"></span>Pessimistisch</span>
+        <span><span class="dot" style="background:#4f9cf0"></span>Erwartet</span>
+        <span><span class="dot" style="background:#3ba776"></span>Optimistisch</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: BEISPIEL-KOMBINATIONEN ============ -->
+  <section class="view" id="view-empf">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg> Beispiel-Kombinationen</h2>
+    <p class="vsub">Beispiele, wie man mehrere Werte mischen kann – in 4 Sicherheitsstufen. Ein Klick übernimmt die Mischung ins Portfolio, wo du Betrag und Laufzeit anpassen kannst.</p>
+    <div class="banner"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg> <strong>Keine Anlageempfehlung.</strong> Dies sind rein illustrative Beispiele und statistische Prognosen zu Bildungs- und Informationszwecken – keine Empfehlung, keine Anlageberatung und keine Garantie. Vergangene Wertentwicklung sagt nichts über die Zukunft. Jede Anlageentscheidung triffst du eigenverantwortlich und auf eigenes Risiko.</div>
+    <div class="card" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end"><div><label>Monatlicher Sparbetrag (€)</label><input type="number" id="empfRate" value="200" min="0" step="10" style="max-width:160px"></div><div style="flex:1;min-width:200px"><label>Laufzeit: <span id="empfYearsLbl" class="val">20</span> Jahre</label><input type="range" id="empfYears" min="1" max="50" value="20"></div></div><div id="comboWrap"></div>
+  </section>
+
+  <!-- ============ VIEW: ZIEL-RECHNER ============ -->
+  <section class="view" id="view-ziel">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h12l-2.5 3.5L17 11H5"/></svg> Ziel-Rechner</h2>
+    <p class="vsub">Andersrum gerechnet: Sag dein Ziel – wir sagen dir die n&ouml;tige monatliche Sparrate.</p>
+    <div class="card">
+      <div class="inrow">
+        <div><label>Zielbetrag (&euro;)</label><input type="number" id="zTarget" value="100000" min="0" step="1000"></div>
+        <div><label>Startkapital (&euro;)</label><input type="number" id="zStart" value="0" min="0" step="100"></div>
+        <div><label>Laufzeit: <span id="zYearsLbl" class="val">20</span> Jahre</label><input type="range" id="zYears" min="1" max="50" value="20" style="margin-top:12px"></div>
+        <div><label>Erwartete Rendite p.a.</label><select id="zRet">
+          <option value="3">Sicher / Anleihen &middot; ca. 3 %</option>
+          <option value="5">Ausgewogen &middot; ca. 5 %</option>
+          <option value="7" selected>Welt-ETF &middot; ca. 7 %</option>
+          <option value="9">Chancenreich &middot; ca. 9 %</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="lbl">N&ouml;tige Sparrate</div><div class="num blue" id="zRate">&ndash;</div><div class="pct blue">pro Monat</div></div>
+      <div class="kpi"><div class="lbl">Eingezahlt gesamt</div><div class="num gray" id="zInv">&ndash;</div><div class="pct gray" id="zInvSub">&ndash;</div></div>
+      <div class="kpi"><div class="lbl">Davon Gewinn</div><div class="num green" id="zGain">&ndash;</div><div class="pct green">durch Zinseszins</div></div>
+      <div class="kpi"><div class="lbl">Zielbetrag</div><div class="num blue" id="zGoal">&ndash;</div><div class="pct blue">nach <span id="zGoalY">20</span> J.</div></div>
+    </div>
+    <div class="card"><div class="selsub">Rechnung mit Zinseszins (monatlich), ohne Steuern/Kosten. Es ist eine Sch&auml;tzung &ndash; die tats&auml;chliche Rendite schwankt, daher kann die n&ouml;tige Rate abweichen.</div></div>
+  </section>
+
+  <!-- ============ VIEW: RATGEBER / FAQ ============ -->
+  <section class="view" id="view-faq">
+    <h2 class="vh">Ratgeber &amp; FAQ</h2>
+    <p class="vsub">Kurz erkl&auml;rt &ndash; die wichtigsten Fragen f&uuml;r Einsteiger. Keine Anlageberatung.</p>
+    <div class="card">
+      <h2 class="vh" style="font-size:19px">Wie fange ich mit ETFs an?</h2>
+      <p style="font-size:14.5px;line-height:1.7;color:var(--text)">Der Einstieg ist einfacher, als viele denken. In K&uuml;rze: 1) Ein <strong>Depot</strong> bei einem g&uuml;nstigen Anbieter er&ouml;ffnen (Online-Broker oder Neobroker). 2) Einen <strong>breiten Welt-ETF</strong> w&auml;hlen &ndash; z.&nbsp;B. auf den MSCI World oder FTSE All-World; damit investierst du in tausende Firmen weltweit auf einmal. 3) Einen <strong>Sparplan</strong> einrichten, der automatisch jeden Monat einen festen Betrag anlegt &ndash; schon ab etwa 25&nbsp;&euro;. 4) <strong>Dranbleiben</strong> und Schwankungen aushalten: Wer lange investiert bleibt, gleicht gute und schlechte Jahre aus. Wichtig: nur Geld anlegen, das du l&auml;ngere Zeit nicht brauchst, und vorher einen kleinen Notgroschen zur&uuml;cklegen.</p>
+    </div>
+    <div class="card">
+      <h2 class="vh" style="font-size:19px">100 &euro; im Monat &ndash; was wird daraus?</h2>
+      <p style="font-size:14.5px;line-height:1.7;color:var(--text)">Angenommen, du legst 100&nbsp;&euro; monatlich in einen breiten ETF an und rechnest langfristig mit rund 7&nbsp;% Rendite pro Jahr. Dann w&auml;ren aus deinen Einzahlungen &ndash; rein statistisch &ndash; nach <strong>10 Jahren ca. 17.000&nbsp;&euro;</strong> (eingezahlt 12.000&nbsp;&euro;), nach <strong>20 Jahren ca. 52.000&nbsp;&euro;</strong> (eingezahlt 24.000&nbsp;&euro;) und nach <strong>30 Jahren ca. 122.000&nbsp;&euro;</strong> (eingezahlt 36.000&nbsp;&euro;). Der gr&ouml;&szlig;te Teil des Endbetrags ist dann <strong>Zinseszins</strong>, nicht deine Einzahlung &ndash; deshalb lohnt sich fr&uuml;h anfangen so stark. Probier deine eigene Zahl im Sparplan-Rechner aus. Hinweis: Das sind Sch&auml;tzungen; die tats&auml;chliche Rendite schwankt und ist nicht garantiert.</p>
+    </div>
+    <div class="card">
+      <h2 class="vh" style="font-size:19px">Sparplan: 5 Grundlagen, die wirklich z&auml;hlen</h2>
+      <p style="font-size:14.5px;line-height:1.7;color:var(--text)"><strong>1. Zeit schl&auml;gt Timing:</strong> Wichtiger als der perfekte Einstieg ist, lange dabei zu bleiben. <strong>2. Streuung senkt Risiko:</strong> Ein breiter ETF ist sicherer als einzelne Aktien. <strong>3. Kosten dr&uuml;cken die Rendite:</strong> Achte auf niedrige Geb&uuml;hren (TER) und g&uuml;nstige Broker. <strong>4. Automatisieren:</strong> Ein Dauerauftrag/Sparplan nimmt dir Disziplin und Emotionen ab. <strong>5. Ruhe bewahren:</strong> Kursst&uuml;rze geh&ouml;ren dazu &ndash; wer dann nicht panisch verkauft, f&auml;hrt langfristig meist besser. Diese f&uuml;nf Punkte sind keine Beratung, aber ein solider roter Faden f&uuml;r den Anfang.</p>
+    </div>
+    <div class="card">
+      <details><summary>Was ist ein ETF?</summary><p>Ein ETF ist ein b&ouml;rsengehandelter Indexfonds &ndash; ein Korb aus vielen Aktien oder Anleihen in einem Papier. Statt einzelne Firmen zu kaufen, kaufst du auf einen Schlag einen ganzen Markt. Das streut das Risiko und ist f&uuml;r Einsteiger oft der einfachste Einstieg.</p></details>
+      <details><summary>Was ist ein Sparplan?</summary><p>Beim Sparplan legst du automatisch jeden Monat einen festen Betrag an (z.&nbsp;B. 100&nbsp;&euro;). Über viele Jahre entsteht durch den Zinseszins-Effekt aus kleinen Raten ein gro&szlig;er Betrag &ndash; auch wenn die M&auml;rkte zwischendurch schwanken.</p></details>
+      <details><summary>Was ist der Zinseszins?</summary><p>Du bekommst nicht nur auf dein eingezahltes Geld Rendite, sondern auch auf die bereits erzielten Gewinne. Über Jahrzehnte ist das der st&auml;rkste Hebel beim Verm&ouml;gensaufbau &ndash; je fr&uuml;her du startest, desto gr&ouml;&szlig;er der Effekt.</p></details>
+      <details><summary>Was ist eine Dividende?</summary><p>Eine Dividende ist ein Teil des Firmengewinns, der regelm&auml;&szlig;ig an Anteilseigner ausgezahlt wird &ndash; eine Art passives Einkommen. Nicht jede Aktie zahlt Dividende; Wachstumsfirmen investieren Gewinne oft lieber zur&uuml;ck.</p></details>
+      <details><summary>Wie viel sollte ich sparen?</summary><p>Das h&auml;ngt von deinem Einkommen und deinen Zielen ab. Eine verbreitete Faustregel sind rund 10&nbsp;% des Nettoeinkommens &ndash; aber jeder Betrag ist besser als keiner. Nutze den Ziel-Rechner, um zu sehen, welche Rate zu deinem Wunschbetrag f&uuml;hrt.</p></details>
+      <details><summary>Was bedeutet die Risikoklasse 1&ndash;7?</summary><p>Das ist ein EU-Standard: 1 = sehr sicher (kaum Schwankung), 7 = sehr spekulativ (starke Ausschl&auml;ge). Breite ETFs liegen meist niedriger, Einzelaktien h&ouml;her. Je l&auml;nger dein Anlagehorizont, desto besser gleichen sich Schwankungen aus.</p></details>
+      <details><summary>Muss ich Steuern zahlen?</summary><p>In Deutschland fallen auf Gewinne und Dividenden die Abgeltungssteuer (rund 26,4&nbsp;%) an &ndash; abz&uuml;glich des Sparerpauschbetrags von 1.000&nbsp;&euro; pro Jahr. Im Rechner kannst du den Schalter &bdquo;Nach Steuern &amp; Kosten&ldquo; aktivieren. Das ist eine vereinfachte Sch&auml;tzung, keine Steuerberatung.</p></details>
+      <details><summary>Ist das hier eine Anlageberatung?</summary><p>Nein. InvestBlick ist ein reines Info- und Bildungs-Tool mit statistischen Sch&auml;tzungen. Es gibt keine Empfehlungen. Anlageentscheidungen triffst du eigenverantwortlich &ndash; im Zweifel mit unabh&auml;ngiger Beratung.</p></details>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: VERGLEICH ============ -->
+  <section class="view" id="view-vergleich">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M7 8l-3 3 3 3"/><path d="M17 8l3 3-3 3"/></svg> Vergleich</h2>
+    <p class="vsub">Zwei Werte direkt nebeneinander &ndash; gleiche Sparrate, gleiches Zeitfenster.</p>
+    <div class="card">
+      <div class="inrow">
+        <div><label>Wert A</label><select id="vA"></select></div>
+        <div><label>Wert B</label><select id="vB"></select></div>
+        <div><label>Sparrate (&euro;/Monat)</label><input type="number" id="vRate" value="200" min="0" step="10"></div>
+        <div><label>Laufzeit: <span id="vYearsLbl" class="val">20</span> Jahre</label><input type="range" id="vYears" min="1" max="50" value="20" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card" style="overflow:auto">
+      <table class="yr" id="vTable"><thead><tr><th>Kennzahl</th><th id="vAName">A</th><th id="vBName">B</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card"><h2>Entwicklung im Vergleich</h2>
+      <canvas id="vChart" height="150"></canvas>
+      <div class="legend">
+        <span><span class="dot" style="background:#4f9cf0"></span><span id="vLegA">A</span></span>
+        <span><span class="dot" style="background:#e0b64f"></span><span id="vLegB">B</span></span>
+        <span><span class="dot" style="background:#7a8aa0"></span>Eingezahlt</span>
+      </div>
+    </div>
+    <div class="card"><div class="selsub">Vergleich mit historischer/Experten-Rendite (je nach Umschalter oben), Zinseszins, ohne Steuern/Kosten. Sch&auml;tzung, keine Garantie.</div></div>
+  </section>
+
+  <!-- ============ VIEW: ENTNAHMEPLAN ============ -->
+  <section class="view" id="view-entnahme">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14" r="1.1" fill="currentColor"/></svg> Entnahmeplan</h2>
+    <p class="vsub">F&uuml;r den Ruhestand: Wie lange reicht dein Verm&ouml;gen bei einer monatlichen Entnahme?</p>
+    <div class="card">
+      <div class="inrow">
+        <div><label>Startverm&ouml;gen (&euro;)</label><input type="number" id="eStart" value="300000" min="0" step="1000"></div>
+        <div><label>Monatliche Entnahme (&euro;)</label><input type="number" id="eWd" value="1000" min="0" step="50"></div>
+        <div><label>Erwartete Rendite p.a.</label><select id="eRet"><option value="3">Sicher &middot; 3 %</option><option value="5" selected>Ausgewogen &middot; 5 %</option><option value="7">Chancenreich &middot; 7 %</option></select></div>
+        <div style="display:flex;align-items:flex-end"><label class="toggle" style="margin-top:0"><input type="checkbox" id="eInfl" checked> Entnahme j&auml;hrlich +2 % (Inflation)</label></div>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="lbl">Reicht f&uuml;r</div><div class="num blue" id="eYears">&ndash;</div><div class="pct blue" id="eYearsSub">&ndash;</div></div>
+      <div class="kpi"><div class="lbl">Entnommen gesamt</div><div class="num gray" id="eTotal">&ndash;</div><div class="pct gray">bis zum Ende</div></div>
+      <div class="kpi"><div class="lbl">Nachhaltige Rate (4-%-Regel)</div><div class="num green" id="eSafe">&ndash;</div><div class="pct green">/ Monat, ~dauerhaft</div></div>
+      <div class="kpi"><div class="lbl">Rendite-Annahme</div><div class="num blue" id="eRetShow">&ndash;</div><div class="pct blue">p.a.</div></div>
+    </div>
+    <div class="card"><h2>Verm&ouml;gensverlauf</h2><canvas id="eChart" height="150"></canvas></div>
+    <div class="card"><div class="selsub">Vereinfachte Simulation mit konstanter Rendite. In Wirklichkeit schwankt sie &ndash; besonders schwache Jahre direkt zu Beginn der Entnahme sind riskant (&bdquo;Renditereihenfolge-Risiko&ldquo;). Sch&auml;tzung, keine Beratung.</div></div>
+  </section>
+
+  <!-- ============ VIEW: BARRIEREFREIHEIT ============ -->
+  <section class="view" id="view-a11y">
+    <h2 class="vh">Barrierefreiheitserkl&auml;rung</h2>
+    <div class="footer">
+      <p>Der Betreiber ist bem&uuml;ht, diese Website im Einklang mit den Anforderungen an die digitale Barrierefreiheit (WCAG 2.1, Stufe AA, sowie BFSG/EN 301 549) nutzbar zu gestalten.</p>
+      <h3>Stand der Vereinbarkeit</h3>
+      <p>Diese Website ist aufgrund der nachfolgend genannten Einschr&auml;nkungen <strong>teilweise konform</strong> mit den genannten Standards.</p>
+      <h3>Umgesetzte Ma&szlig;nahmen</h3>
+      <p>Bedienbarkeit per Tastatur, sichtbare Fokus-Markierung, vorlesbare Info-Hinweise (ARIA), mit Formularfeldern verkn&uuml;pfte Beschriftungen, Ber&uuml;cksichtigung der Einstellung &bdquo;Bewegung reduzieren&ldquo; und ein Dialog mit Fokusf&uuml;hrung.</p>
+      <h3>Bekannte Einschr&auml;nkungen</h3>
+      <p>Die eingebetteten Live-Charts (TradingView) sind Inhalte Dritter, deren Barrierefreiheit nicht beeinflusst werden kann; wichtige Kennzahlen werden zus&auml;tzlich als Text angeboten. Die Auswahl von Tabellenzeilen ist derzeit prim&auml;r per Maus vorgesehen. An Verbesserungen wird gearbeitet.</p>
+      <h3>Feedback und Kontakt</h3>
+      <p>Sind dir Barrieren aufgefallen? Melde dich gern: Niklas.ma.schulz@gmail.com. Wir bem&uuml;hen uns um zeitnahe Abhilfe.</p>
+      <p style="margin-top:8px;color:#6f8093">Diese Erkl&auml;rung wurde bei Erstellung der Website erstellt und wird bei &Auml;nderungen aktualisiert.</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: ADMIN (versteckt, nicht in der Navi) ============ -->
+  <section class="view" id="view-admin">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 118 0v3"/></svg> Admin-Bereich – nur für dich</h2>
+    <p class="vsub">Diesen Bereich sehen normale Besucher nicht (nicht in der Menüleiste). Öffnen: Adresse mit <code>#admin</code> am Ende oder 5× auf das Logo „InvestBlick" klicken.</p>
+    <div class="card" id="adminGate">
+      <label>Zugangscode</label>
+      <input type="password" id="adminPass" placeholder="Code eingeben" style="max-width:220px">
+      <button class="dbtn" id="adminBtn" style="margin-top:10px;padding:9px 16px;font-size:13px">Anzeigen</button>
+      <div class="selsub" style="margin-top:8px">Standard-Code: <strong>nms</strong> (im Datei-Code änderbar). Hinweis: Das ist eine einfache Sichtschutz-Lösung, keine echte Passwortsicherung.</div>
+    </div>
+    <div id="adminContent" style="display:none"></div>
+  </section>
+
+  <!-- ============ VIEW: ÜBER / KONTAKT ============ -->
+  <section class="view" id="view-about">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg> Über InvestBlick & Kontakt</h2>
+    <div class="footer">
+      <h3>Was ist InvestBlick?</h3>
+      <p>InvestBlick ist ein kostenloses, werbefreies Info-Tool, das Einsteigern hilft, Sparpläne, Dividenden und die Wertentwicklung von Aktien und ETFs besser zu verstehen. Du kannst einen Monatsbetrag eingeben und statistisch sehen, wie sich das Geld über die Jahre entwickeln könnte – inklusive Zinseszins, Dividenden, Risikoklasse und Wahrscheinlichkeiten. Dazu gibt es Live-Charts und die Möglichkeit, mehrere Werte zu einem Portfolio zu kombinieren.</p>
+      <h3>Wichtig</h3>
+      <p>Alle Berechnungen sind statistische Schätzungen auf Basis historischer Durchschnittswerte und stellen <strong>keine Anlageberatung</strong> dar. Die Live-Daten stammen von TradingView. Details findest du unter „Rechtliches" und „Datenschutz".</p>
+      <h3>Kontakt</h3>
+      <p>Betreiber: Niklas Schulz<br>E-Mail: Niklas.ma.schulz@gmail.com</p>
+      <p style="margin-top:6px;color:#6f8093">Feedback und Verbesserungsvorschläge sind jederzeit willkommen.</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: IMPRESSUM ============ -->
+  <section class="view" id="view-impressum">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h5"/></svg> Impressum</h2>
+    <div class="footer">
+      
+      <h3>Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz)</h3>
+      <p>Niklas Schulz<br>Waldstr. 28<br>24939 Flensburg<br>Deutschland</p>
+      <h3>Kontakt</h3>
+      <p>E-Mail: Niklas.ma.schulz@gmail.com</p>
+      <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+      <p>Niklas Schulz, Anschrift wie oben</p>
+      <h3>Haftung für Inhalte</h3>
+      <p>Als Diensteanbieter bin ich für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Die Inhalte dienen ausschließlich der Information und stellen keine Anlageberatung dar. Für die Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen.</p>
+      <h3>Haftung für Links</h3>
+      <p>Diese Seite bindet Inhalte Dritter (TradingView) ein und kann auf externe Websites verweisen, auf deren Inhalte ich keinen Einfluss habe. Für diese fremden Inhalte wird keine Gewähr übernommen; verantwortlich ist stets der jeweilige Anbieter.</p>
+      <h3>Urheberrecht</h3>
+      <p>Die durch den Betreiber erstellten Inhalte unterliegen dem deutschen Urheberrecht. Marken- und Produktnamen sowie Kurs-/Chartdaten sind Eigentum der jeweiligen Rechteinhaber (u. a. TradingView).</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: DATENSCHUTZ ============ -->
+  <section class="view" id="view-datenschutz">
+    <h2 class="vh"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 118 0v3"/></svg> Datenschutzerklärung</h2>
+    <div class="footer">
+      
+      <h3>1. Verantwortlicher</h3>
+      <p>Niklas Schulz, Waldstr. 28, 24939 Flensburg, Deutschland. E-Mail: Niklas.ma.schulz@gmail.com</p>
+      <h3>2. Grundsätzliches</h3>
+      <p>Der Schutz deiner Daten ist mir wichtig. Diese Website ist ein reines Info-Tool. Es gibt keine Benutzerkonten, keine Newsletter-Anmeldung und keine aktive Erhebung personenbezogener Daten durch den Betreiber.</p>
+      <h3>3. Hosting &amp; Server-Logdateien</h3>
+      <p>Die Website wird bei einem externen Hoster (z. B. Netlify / Cloudflare) betrieben. Beim Aufruf werden technisch notwendige Daten (u. a. IP-Adresse, Datum/Uhrzeit, abgerufene Datei, Browsertyp) in Server-Logdateien verarbeitet, um die Auslieferung und Sicherheit der Seite zu gewährleisten. Rechtsgrundlage ist das berechtigte Interesse an einem sicheren Betrieb (Art. 6 Abs. 1 lit. f DSGVO).</p>
+      <h3>4. Lokale Speicherung im Browser (localStorage)</h3>
+      <p>Zur Funktion speichert die Seite Einstellungen und Inhalte (z. B. gespeicherte Portfolios, gewähltes Design, Cookie-/Zustimmungsauswahl, lokale Nutzungszähler) ausschließlich lokal in deinem Browser. Diese Daten werden nicht an den Betreiber übertragen und verbleiben auf deinem Gerät. Du kannst sie jederzeit durch Löschen der Browserdaten entfernen.</p>
+      <h3>5. Einbindung von TradingView (Live-Charts)</h3>
+      <p>Für Live-Kurse, Charts und Kennzahlen werden Widgets der TradingView Inc. eingebunden. Beim Laden dieser Inhalte wird eine Verbindung zu Servern von TradingView hergestellt; dabei kann deine IP-Adresse übertragen werden, und es können Cookies oder ähnliche Technologien gesetzt werden. Die Verarbeitung kann auch in Drittländern (u. a. USA) erfolgen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO) über den Cookie-Hinweis bzw. das berechtigte Interesse an der Darstellung aktueller Kurse. Einzelheiten in der Datenschutzerklärung von TradingView: tradingview.com/privacy-policy/.</p>
+      <h3>5b. Reichweitenmessung</h3><p>Sofern aktiviert, wird zur anonymen Reichweitenmessung der cookielose Dienst GoatCounter eingesetzt. Dabei werden keine Cookies gesetzt und keine personenbezogenen Daten gespeichert; erfasst werden nur anonyme, aggregierte Aufrufzahlen. Rechtsgrundlage ist das berechtigte Interesse an einer datensparsamen Reichweitenanalyse (Art. 6 Abs. 1 lit. f DSGVO).</p>
+      <h3>6. Cookies</h3>
+      <p>Technisch notwendige Speicherungen werden für die Grundfunktion genutzt. Weitere, nicht notwendige Technologien (z. B. durch TradingView) werden nur mit deiner Einwilligung geladen, die du über den Cookie-Hinweis erteilst und jederzeit für die Zukunft widerrufen kannst (Browserdaten löschen).</p>
+      <h3>7. Deine Rechte</h3>
+      <p>Du hast das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18), Datenübertragbarkeit (Art. 20) sowie Widerspruch (Art. 21 DSGVO). Zudem besteht ein Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde.</p>
+      <h3>8. Aktualität</h3>
+      <p>Diese Datenschutzerklärung kann angepasst werden, wenn sich die Website oder die rechtlichen Vorgaben ändern.</p>
+    </div>
+  </section>
+
+  <!-- Seiten-Footer (immer sichtbar) -->
+  <div class="sitefoot">
+    <div class="footlinks">
+      <a href="investblicknmsetf/">ETF-Handbuch</a>·
+      <a href="investblicknmsaktien/">Aktien-Handbuch</a>·
+      <a role="button" tabindex="0" data-go="faq">Ratgeber</a>·
+      <a role="button" tabindex="0" data-go="a11y">Barrierefreiheit</a>·
+      <a role="button" tabindex="0" data-go="about">Über &amp; Kontakt</a>·
+      <a role="button" tabindex="0" data-go="legal">Rechtliches</a>·
+      <a role="button" tabindex="0" data-go="impressum">Impressum</a>·
+      <a role="button" tabindex="0" data-go="datenschutz">Datenschutz</a>
+    </div>
+    <div>© <span id="footYear">2026</span> InvestBlick · Keine Anlageberatung · Live-Daten von TradingView ohne Gewähr</div>
+  </div>
+</div>
+
+<button id="aiBtn" class="aibtn" aria-label="Hilfe-Assistent oeffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-11.5 7.2L4 20l1-4.5A8 8 0 1121 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg></button>
+<div id="aiPanel" class="aipanel" role="dialog" aria-label="Hilfe-Assistent">
+  <div class="aihead"><strong>InvestBlick-Assistent</strong><button id="aiClose" class="aiclose" aria-label="Schliessen">&#10005;</button></div>
+  <div id="aiMsgs" class="aimsgs"></div>
+  <div id="aiChips" class="aichips"></div>
+  <div class="aiinput"><input type="text" id="aiInput" placeholder="Frag mich etwas ..." aria-label="Frage eingeben"><button id="aiSend" class="aisend" aria-label="Senden">&rsaquo;</button></div>
+  <div class="aidis">Automatisierte Info-Antworten &middot; keine Anlageberatung</div>
+</div>
+
+<!-- Detail-Modal -->
+<div class="modal" id="modal"><div class="modalinner" role="dialog" aria-modal="true" aria-label="Detailansicht des Wertpapiers">
+  <div class="mhead"><div><div class="selname" id="mName">–</div><div class="selsub" id="mSub">–</div></div><button class="closex" id="closeModal">✕</button></div>
+  <div class="banner"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg> Keine Anlageberatung – nur Information. Live-Daten von TradingView ohne Gewähr.</div>
+  <div class="wlabel">Live-Chart <span class="info" data-tip="Kursverlauf über die Zeit. Linie hoch = Wert gestiegen, runter = gefallen. Zeitraum oben umstellbar.">i</span></div>
+  <div class="twwrap" id="mAdvChart" style="height:400px"></div>
+  <div class="grid2">
+    <div><div class="wlabel">Übersicht <span class="info" data-tip="Aktueller Kurs, Handelswährung, Börse und Basisdaten zum Wert.">i</span></div><div class="twwrap" id="mSymInfo" style="min-height:180px"></div></div>
+    <div><div class="wlabel">Technische Analyse <span class="info r" data-tip="Automatische Einschätzung (Kaufen/Neutral/Verkaufen), berechnet aus vielen Kurs-Indikatoren und gleitenden Durchschnitten. Es ist nur ein rechnerisches Signal aus der Vergangenheit – keine Empfehlung und keine Garantie für die Zukunft.">i</span></div><div class="twwrap" id="mTech" style="min-height:400px"></div></div>
+  </div>
+  <div class="wlabel">Profil <span class="info" data-tip="Beschreibung des Unternehmens bzw. Fonds: Was macht die Firma, Branche, Land und wichtige Eckdaten.">i</span></div>
+  <div class="twwrap" id="mProfile" style="min-height:340px"></div>
+  <div class="expl" id="mExpl"></div>
+</div></div>
+
+<script>
+const ASSETS=[
+ {name:"MSCI World (Industrieländer)",type:"ETF",region:"Welt",mean:8.0,vol:15,div:1.8,emean:6.8,ter:0.2,sym:"XETR:EUNL"},
+ {name:"FTSE All-World / MSCI ACWI",type:"ETF",region:"Welt inkl. EM",mean:7.5,vol:15,div:2.0,emean:7.0,ter:0.2,sym:"XETR:VWCE"},
+ {name:"S&P 500 (USA)",type:"ETF",region:"USA",mean:10.0,vol:16,div:1.3,emean:6.0,ter:0.2,sym:"AMEX:SPY"},
+ {name:"NASDAQ 100 (US-Tech)",type:"ETF",region:"USA Tech",mean:13.0,vol:22,div:0.7,emean:6.8,ter:0.2,sym:"NASDAQ:QQQ"},
+ {name:"STOXX Europe 600",type:"ETF",region:"Europa",mean:7.0,vol:17,div:3.0,emean:7.5,ter:0.2,sym:"XETR:EXSA"},
+ {name:"MSCI Emerging Markets",type:"ETF",region:"Schwellenländer",mean:7.0,vol:20,div:2.7,emean:8.5,ter:0.5,sym:"AMEX:EEM"},
+ {name:"MSCI World Small Cap",type:"ETF",region:"Welt",mean:8.5,vol:18,div:1.7,emean:7.3,ter:0.2,sym:"XETR:IUSN"},
+ {name:"MSCI World Info. Technology",type:"ETF",region:"Welt Tech",mean:13.0,vol:23,div:0.8,emean:7.0,ter:0.5,sym:"AMEX:IXN"},
+ {name:"MDAX (dt. Mid Caps)",type:"ETF",region:"Deutschland",mean:7.5,vol:22,div:2.5,emean:7.5,ter:0.2,sym:"XETR:EXS3"},
+ {name:"DAX 40 (Deutschland)",type:"ETF",region:"Deutschland",mean:7.5,vol:20,div:2.8,emean:7.5,ter:0.2,sym:"XETR:DAX"},
+ {name:"Vanguard FTSE All-World High Dividend",type:"ETF",region:"Welt",mean:6.5,vol:14,div:3.1,emean:7.0,ter:0.4,sym:"LSE:VHYL"},
+ {name:"iShares STOXX Global Select Dividend 100",type:"ETF",region:"Welt",mean:5.5,vol:16,div:3.9,emean:7.0,ter:0.4,sym:"XETR:ISPA"},
+ {name:"SPDR S&P Global Dividend Aristocrats",type:"ETF",region:"Welt",mean:6.0,vol:15,div:3.8,emean:7.0,ter:0.4,sym:"XETR:ZPRG"},
+ {name:"SPDR S&P US Dividend Aristocrats",type:"ETF",region:"USA",mean:8.5,vol:15,div:2.6,emean:7.0,ter:0.4,sym:"XETR:SPYD"},
+ {name:"SPDR S&P Euro Dividend Aristocrats",type:"ETF",region:"Eurozone",mean:6.0,vol:17,div:3.7,emean:7.0,ter:0.4,sym:"XETR:SPYW"},
+ {name:"Fidelity Global Quality Income",type:"ETF",region:"Welt",mean:8.0,vol:14,div:2.4,emean:7.0,ter:0.4,sym:"LSE:FGQI"},
+ {name:"iShares MSCI World Quality Dividend",type:"ETF",region:"Welt",mean:8.0,vol:14,div:2.6,emean:7.0,ter:0.4,sym:"LSE:WQDS"},
+ {name:"Schwab US Dividend Equity (SCHD)",type:"ETF",region:"USA",mean:8.5,vol:15,div:3.6,emean:7.0,ter:0.4,sym:"AMEX:SCHD"},
+ {name:"Global X SuperDividend",type:"ETF",region:"Welt",mean:3.5,vol:18,div:8.0,emean:7.0,ter:0.4,sym:"AMEX:SDIV"},
+ {name:"iShares Global REIT (Immobilien)",type:"ETF",region:"Welt",mean:6.0,vol:18,div:3.6,emean:7.0,ter:0.4,sym:"AMEX:REET"},
+ {name:"Xtrackers AI & Big Data",type:"ETF",region:"Thema KI/Big Data",mean:14.0,vol:24,div:0.0,emean:7.0,ter:0.5,sym:"XETR:XAIX"},
+ {name:"Global X Robotics & AI (BOTZ)",type:"ETF",region:"Thema Robotik/KI",mean:11.0,vol:24,div:0.3,emean:7.0,ter:0.5,sym:"NASDAQ:BOTZ"},
+ {name:"VanEck Semiconductor (SMH)",type:"ETF",region:"Thema Halbleiter",mean:15.0,vol:28,div:0.6,emean:7.0,ter:0.5,sym:"NASDAQ:SMH"},
+ {name:"First Trust Cybersecurity (CIBR)",type:"ETF",region:"Thema Cyber",mean:12.0,vol:24,div:0.3,emean:7.0,ter:0.5,sym:"NASDAQ:CIBR"},
+ {name:"First Trust Cloud Computing (SKYY)",type:"ETF",region:"Thema Cloud",mean:12.0,vol:26,div:0.0,emean:7.0,ter:0.5,sym:"NASDAQ:SKYY"},
+ {name:"Technology Select (XLK)",type:"ETF",region:"Thema Tech",mean:14.0,vol:22,div:0.7,emean:7.0,ter:0.5,sym:"AMEX:XLK"},
+ {name:"iShares Global Clean Energy",type:"ETF",region:"Thema Energie",mean:6.0,vol:30,div:1.0,emean:7.0,ter:0.5,sym:"NASDAQ:ICLN"},
+ {name:"Global X Lithium & Battery (LIT)",type:"ETF",region:"Thema Akku/EV",mean:8.0,vol:30,div:0.8,emean:7.0,ter:0.5,sym:"AMEX:LIT"},
+ {name:"VanEck Video Gaming & eSports",type:"ETF",region:"Thema Gaming",mean:10.0,vol:24,div:0.4,emean:7.0,ter:0.5,sym:"NASDAQ:ESPO"},
+ {name:"Invesco Water Resources (PHO)",type:"ETF",region:"Thema Wasser",mean:9.0,vol:17,div:1.2,emean:7.0,ter:0.5,sym:"NASDAQ:PHO"},
+ {name:"Health Care Select (XLV)",type:"ETF",region:"Thema Gesundheit",mean:9.0,vol:15,div:1.5,emean:6.5,ter:0.4,sym:"AMEX:XLV"},
+ {name:"ARK Innovation (ARKK)",type:"ETF",region:"Thema Disruptiv",mean:10.0,vol:40,div:0.0,emean:7.0,ter:0.5,sym:"AMEX:ARKK"},
+ {name:"Global Aggregate Anleihen-ETF",type:"ETF",region:"Welt",mean:3.0,vol:6,div:3.0,emean:4.3,ter:0.15,sym:"NASDAQ:BNDW"},
+ {name:"Euro Staatsanleihen-ETF",type:"ETF",region:"Eurozone",mean:2.5,vol:5,div:2.5,emean:3.2,ter:0.15,sym:"XETR:EUNH"},
+ {name:"Unternehmensanleihen (IG)",type:"ETF",region:"Welt",mean:3.5,vol:7,div:3.5,emean:4.9,ter:0.15,sym:"AMEX:LQD"},
+ {name:"Gold (ETC)",type:"ETF",region:"Rohstoff",mean:5.0,vol:15,div:0.0,emean:4.0,ter:0.2,sym:"AMEX:GLD"},
+ {name:"Geldmarkt / Tagesgeld-nah",type:"ETF",region:"Eurozone",mean:2.5,vol:1,div:2.5,emean:3.0,ter:0.15,sym:"AMEX:BIL"},
+ {name:"Mischportfolio 60/40",type:"ETF",region:"Welt",mean:6.0,vol:9,div:2.0,emean:5.5,ter:0.2,sym:"AMEX:AOR"},
+ {name:"Realty Income (O) – REIT",type:"Aktie",region:"USA",mean:6.0,vol:18,div:5.3,emean:6.0,ter:0.0,sym:"NYSE:O"},
+ {name:"Altria (MO)",type:"Aktie",region:"USA",mean:7.0,vol:20,div:6.0,emean:6.5,ter:0.0,sym:"NYSE:MO"},
+ {name:"Verizon (VZ)",type:"Aktie",region:"USA",mean:4.0,vol:18,div:6.0,emean:5.1,ter:0.0,sym:"NYSE:VZ"},
+ {name:"Pfizer (PFE)",type:"Aktie",region:"USA",mean:5.0,vol:20,div:6.5,emean:5.6,ter:0.0,sym:"NYSE:PFE"},
+ {name:"Coca-Cola (KO)",type:"Aktie",region:"USA",mean:7.0,vol:15,div:2.6,emean:6.5,ter:0.0,sym:"NYSE:KO"},
+ {name:"Johnson & Johnson (JNJ)",type:"Aktie",region:"USA",mean:8.0,vol:14,div:3.0,emean:6.9,ter:0.0,sym:"NYSE:JNJ"},
+ {name:"Procter & Gamble (PG)",type:"Aktie",region:"USA",mean:8.0,vol:14,div:2.5,emean:6.9,ter:0.0,sym:"NYSE:PG"},
+ {name:"PepsiCo (PEP)",type:"Aktie",region:"USA",mean:8.0,vol:14,div:3.2,emean:6.9,ter:0.0,sym:"NASDAQ:PEP"},
+ {name:"McDonald's (MCD)",type:"Aktie",region:"USA",mean:10.0,vol:16,div:2.3,emean:7.8,ter:0.0,sym:"NYSE:MCD"},
+ {name:"AbbVie (ABBV)",type:"Aktie",region:"USA",mean:12.0,vol:20,div:3.4,emean:8.7,ter:0.0,sym:"NYSE:ABBV"},
+ {name:"ExxonMobil (XOM)",type:"Aktie",region:"USA",mean:7.0,vol:22,div:3.4,emean:6.5,ter:0.0,sym:"NYSE:XOM"},
+ {name:"3M (MMM)",type:"Aktie",region:"USA",mean:5.0,vol:20,div:4.0,emean:5.6,ter:0.0,sym:"NYSE:MMM"},
+ {name:"Allianz (ALV)",type:"Aktie",region:"Deutschland",mean:8.0,vol:20,div:4.5,emean:7.5,ter:0.0,sym:"XETR:ALV"},
+ {name:"Münchener Rück (MUV2)",type:"Aktie",region:"Deutschland",mean:8.0,vol:18,div:3.3,emean:7.5,ter:0.0,sym:"XETR:MUV2"},
+ {name:"BASF",type:"Aktie",region:"Deutschland",mean:5.0,vol:24,div:6.0,emean:6.1,ter:0.0,sym:"XETR:BAS"},
+ {name:"Mercedes-Benz Group",type:"Aktie",region:"Deutschland",mean:6.0,vol:28,div:7.0,emean:6.6,ter:0.0,sym:"XETR:MBG"},
+ {name:"BMW",type:"Aktie",region:"Deutschland",mean:6.0,vol:26,div:6.0,emean:6.6,ter:0.0,sym:"XETR:BMW"},
+ {name:"Siemens (SIE)",type:"Aktie",region:"Deutschland",mean:9.0,vol:22,div:2.6,emean:7.9,ter:0.0,sym:"XETR:SIE"},
+ {name:"Deutsche Telekom (DTE)",type:"Aktie",region:"Deutschland",mean:6.0,vol:18,div:3.0,emean:6.6,ter:0.0,sym:"XETR:DTE"},
+ {name:"Nestlé",type:"Aktie",region:"Schweiz",mean:8.0,vol:14,div:3.3,emean:7.2,ter:0.0,sym:"SIX:NESN"},
+ {name:"Novartis",type:"Aktie",region:"Schweiz",mean:7.0,vol:16,div:3.5,emean:6.7,ter:0.0,sym:"SIX:NOVN"},
+ {name:"Unilever",type:"Aktie",region:"UK/NL",mean:6.0,vol:15,div:3.5,emean:6.6,ter:0.0,sym:"LSE:ULVR"},
+ {name:"TotalEnergies",type:"Aktie",region:"Frankreich",mean:7.0,vol:22,div:5.0,emean:7.0,ter:0.0,sym:"EURONEXT:TTE"},
+ {name:"Shell",type:"Aktie",region:"UK",mean:6.0,vol:24,div:4.0,emean:6.6,ter:0.0,sym:"LSE:SHEL"},
+ {name:"LVMH",type:"Aktie",region:"Frankreich",mean:12.0,vol:24,div:2.0,emean:9.0,ter:0.0,sym:"EURONEXT:MC"},
+ {name:"Apple (AAPL)",type:"Aktie",region:"USA",mean:20.0,vol:28,div:0.5,emean:9.0,ter:0.0,sym:"NASDAQ:AAPL"},
+ {name:"Microsoft (MSFT)",type:"Aktie",region:"USA",mean:18.0,vol:26,div:0.7,emean:9.0,ter:0.0,sym:"NASDAQ:MSFT"},
+ {name:"Alphabet / Google",type:"Aktie",region:"USA",mean:17.0,vol:28,div:0.4,emean:9.0,ter:0.0,sym:"NASDAQ:GOOGL"},
+ {name:"Amazon (AMZN)",type:"Aktie",region:"USA",mean:20.0,vol:32,div:0.0,emean:9.0,ter:0.0,sym:"NASDAQ:AMZN"},
+ {name:"Nvidia (NVDA)",type:"Aktie",region:"USA",mean:30.0,vol:50,div:0.03,emean:9.0,ter:0.0,sym:"NASDAQ:NVDA"},
+ {name:"Tesla (TSLA)",type:"Aktie",region:"USA",mean:22.0,vol:58,div:0.0,emean:9.0,ter:0.0,sym:"NASDAQ:TSLA"},
+ {name:"SAP",type:"Aktie",region:"Deutschland",mean:11.0,vol:24,div:1.2,emean:8.8,ter:0.0,sym:"XETR:SAP"},
+ {name:"Adidas",type:"Aktie",region:"Deutschland",mean:8.0,vol:30,div:1.2,emean:7.5,ter:0.0,sym:"XETR:ADS"},
+ {name:"Volkswagen VZ",type:"Aktie",region:"Deutschland",mean:5.0,vol:32,div:6.5,emean:6.1,ter:0.0,sym:"XETR:VOW3"},
+ {name:"Airbus",type:"Aktie",region:"Frankreich",mean:12.0,vol:28,div:1.3,emean:9.0,ter:0.0,sym:"EURONEXT:AIR"},
+ {name:"Infineon",type:"Aktie",region:"Deutschland",mean:12.0,vol:34,div:0.8,emean:9.0,ter:0.0,sym:"XETR:IFX"},
+ {name:"Rheinmetall",type:"Aktie",region:"Deutschland",mean:20.0,vol:38,div:1.5,emean:9.0,ter:0.0,sym:"XETR:RHM"},
+ {name:"Porsche AG",type:"Aktie",region:"Deutschland",mean:4.0,vol:30,div:4.0,emean:5.7,ter:0.0,sym:"XETR:P911"},
+ {name:"Deutsche Bank",type:"Aktie",region:"Deutschland",mean:6.0,vol:34,div:2.8,emean:6.6,ter:0.0,sym:"XETR:DBK"},
+ {name:"Deutsche Post / DHL",type:"Aktie",region:"Deutschland",mean:6.0,vol:26,div:4.7,emean:6.6,ter:0.0,sym:"XETR:DHL"},
+ {name:"Zalando",type:"Aktie",region:"Deutschland",mean:6.0,vol:40,div:0.0,emean:6.6,ter:0.0,sym:"XETR:ZAL"},
+ {name:"Sartorius",type:"Aktie",region:"Deutschland",mean:10.0,vol:38,div:0.6,emean:8.4,ter:0.0,sym:"XETR:SRT"},
+ {name:"Meta / Facebook",type:"Aktie",region:"USA",mean:18.0,vol:34,div:0.4,emean:9.0,ter:0.0,sym:"NASDAQ:META"},
+ {name:"Netflix",type:"Aktie",region:"USA",mean:16.0,vol:36,div:0.0,emean:9.0,ter:0.0,sym:"NASDAQ:NFLX"},
+ {name:"Broadcom",type:"Aktie",region:"USA",mean:22.0,vol:30,div:1.5,emean:9.0,ter:0.0,sym:"NASDAQ:AVGO"},
+ {name:"ASML",type:"Aktie",region:"Niederlande",mean:18.0,vol:32,div:0.9,emean:9.0,ter:0.0,sym:"NASDAQ:ASML"},
+ {name:"TSMC",type:"Aktie",region:"Taiwan",mean:18.0,vol:30,div:1.3,emean:9.0,ter:0.0,sym:"NYSE:TSM"},
+ {name:"AMD",type:"Aktie",region:"USA",mean:20.0,vol:45,div:0.0,emean:9.0,ter:0.0,sym:"NASDAQ:AMD"},
+ {name:"Palantir",type:"Aktie",region:"USA",mean:25.0,vol:55,div:0.0,emean:9.0,ter:0.0,sym:"NASDAQ:PLTR"},
+ {name:"Salesforce",type:"Aktie",region:"USA",mean:14.0,vol:30,div:0.5,emean:9.0,ter:0.0,sym:"NYSE:CRM"},
+ {name:"Oracle",type:"Aktie",region:"USA",mean:13.0,vol:26,div:1.1,emean:9.0,ter:0.0,sym:"NYSE:ORCL"},
+ {name:"Adobe",type:"Aktie",region:"USA",mean:15.0,vol:30,div:0.0,emean:9.0,ter:0.0,sym:"NASDAQ:ADBE"},
+ {name:"PayPal",type:"Aktie",region:"USA",mean:8.0,vol:38,div:0.0,emean:6.9,ter:0.0,sym:"NASDAQ:PYPL"},
+ {name:"Uber",type:"Aktie",region:"USA",mean:15.0,vol:40,div:0.0,emean:9.0,ter:0.0,sym:"NYSE:UBER"},
+ {name:"Intel",type:"Aktie",region:"USA",mean:3.0,vol:34,div:1.5,emean:4.7,ter:0.0,sym:"NASDAQ:INTC"},
+ {name:"Eli Lilly",type:"Aktie",region:"USA",mean:20.0,vol:30,div:0.6,emean:9.0,ter:0.0,sym:"NYSE:LLY"},
+ {name:"UnitedHealth",type:"Aktie",region:"USA",mean:12.0,vol:24,div:1.6,emean:8.7,ter:0.0,sym:"NYSE:UNH"},
+ {name:"Berkshire Hathaway",type:"Aktie",region:"USA",mean:11.0,vol:18,div:0.0,emean:8.2,ter:0.0,sym:"NYSE:BRK.B"},
+ {name:"Visa",type:"Aktie",region:"USA",mean:14.0,vol:22,div:0.8,emean:9.0,ter:0.0,sym:"NYSE:V"},
+ {name:"Mastercard",type:"Aktie",region:"USA",mean:15.0,vol:23,div:0.6,emean:9.0,ter:0.0,sym:"NYSE:MA"},
+ {name:"JPMorgan",type:"Aktie",region:"USA",mean:11.0,vol:24,div:2.2,emean:8.2,ter:0.0,sym:"NYSE:JPM"},
+ {name:"Walt Disney",type:"Aktie",region:"USA",mean:6.0,vol:28,div:1.0,emean:6.0,ter:0.0,sym:"NYSE:DIS"},
+ {name:"Nike",type:"Aktie",region:"USA",mean:9.0,vol:26,div:1.6,emean:7.3,ter:0.0,sym:"NYSE:NKE"},
+ {name:"Starbucks",type:"Aktie",region:"USA",mean:9.0,vol:24,div:2.6,emean:7.3,ter:0.0,sym:"NASDAQ:SBUX"},
+ {name:"Costco",type:"Aktie",region:"USA",mean:13.0,vol:22,div:0.5,emean:9.0,ter:0.0,sym:"NASDAQ:COST"},
+ {name:"Walmart",type:"Aktie",region:"USA",mean:10.0,vol:20,div:1.1,emean:7.8,ter:0.0,sym:"NYSE:WMT"},
+ {name:"Home Depot",type:"Aktie",region:"USA",mean:11.0,vol:24,div:2.4,emean:8.2,ter:0.0,sym:"NYSE:HD"},
+ {name:"IBM",type:"Aktie",region:"USA",mean:7.0,vol:22,div:3.3,emean:6.5,ter:0.0,sym:"NYSE:IBM"},
+ {name:"AT&T",type:"Aktie",region:"USA",mean:4.0,vol:22,div:5.5,emean:5.1,ter:0.0,sym:"NYSE:T"},
+ {name:"Chevron",type:"Aktie",region:"USA",mean:8.0,vol:24,div:4.2,emean:6.9,ter:0.0,sym:"NYSE:CVX"},
+ {name:"Ford",type:"Aktie",region:"USA",mean:5.0,vol:34,div:5.0,emean:5.6,ter:0.0,sym:"NYSE:F"},
+ {name:"Boeing",type:"Aktie",region:"USA",mean:6.0,vol:36,div:0.0,emean:6.0,ter:0.0,sym:"NYSE:BA"},
+ {name:"Alibaba",type:"Aktie",region:"China",mean:6.0,vol:40,div:1.0,emean:7.4,ter:0.0,sym:"NYSE:BABA"},
+];
+/* Zusätzliche bekannte Werte nur für Suche/Autovervollständigung (ohne Sparplan-Statistik) */
+const EXTRA=[];
+const SUGGEST=[
+ ...ASSETS.map(a=>({name:a.name,sym:a.sym,meta:a.type+' · '+a.region,idx:ASSETS.indexOf(a)})),
+ ...EXTRA.map(e=>({name:e[0],sym:e[1],meta:'Aktie · Live',idx:-1})),
+];
+
+const Z=1.2816;let DATAMODE='hist';
+const $=id=>document.getElementById(id);
+const eur=n=>n.toLocaleString('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+const pct=n=>n.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+const pct0=n=>Math.round(n)+' %';
+function erf(x){const s=x>=0?1:-1;x=Math.abs(x);const t=1/(1+0.3275911*x);
+ const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function normCdf(z){return 0.5*(1+erf(z/Math.SQRT2));}
+function riskClass(v){if(v<0.5)return 1;if(v<2)return 2;if(v<5)return 3;if(v<10)return 4;if(v<15)return 5;if(v<25)return 6;return 7;}
+const RC_COLOR=["","#2f9e6f","#3ba776","#7fb04a","#e0b64f","#e59a45","#e0685a","#c0392b"];
+const RC_LABEL=["","sehr niedrig","niedrig","niedrig","mittel","erhöht","hoch","sehr hoch"];
+function project(start,rate,ann,months){const rm=ann/100/12;let v=start;for(let m=0;m<months;m++){v+=rate;v*=(1+rm);}return v;}
+function neededReturn(start,rate,years,factor){const months=years*12,target=(start+rate*months)*factor;let lo=-5,hi=40;
+ for(let i=0;i<60;i++){const m=(lo+hi)/2;if(project(start,rate,m,months)<target)lo=m;else hi=m;}return (lo+hi)/2;}
+function twTheme(){return document.body.classList.contains('light')?'light':'dark';}
+function twBuild(el,src,config){el.innerHTML='';const c=document.createElement('div');c.className='tradingview-widget-container';
+ const w=document.createElement('div');w.className='tradingview-widget-container__widget';c.appendChild(w);
+ const s=document.createElement('script');s.src=src;s.async=true;s.type='text/javascript';s.innerHTML=JSON.stringify(config);
+ c.appendChild(s);el.appendChild(c);}
+function twConsent(){try{return localStorage.getItem('cookieChoice')==='all';}catch(e){return false;}}
+function refreshTW(){try{renderMini(ASSETS[SEL]);}catch(e){}try{if(chartsLoaded)initCharts();}catch(e){}try{if($('modal').classList.contains('open'))openModal();}catch(e){}}
+function twWidget(el,src,config){if(twConsent()){twBuild(el,src,config);return;}el.innerHTML='';var box=document.createElement('div');box.className='twconsent';box.innerHTML='<div class="twconsent-in"><p>Hier wird ein Live-Chart von <strong>TradingView</strong> geladen \u2013 dabei werden Daten an TradingView (Drittanbieter, ggf. USA) \u00fcbertragen.</p><button class="sidebtn twload" type="button" style="width:auto;padding:9px 18px">Live-Chart laden</button><label class="twremember"><input type="checkbox" class="twall" checked> k\u00fcnftig immer laden</label></div>';box.querySelector('.twload').onclick=function(){if(box.querySelector('.twall').checked){try{localStorage.setItem('cookieChoice','all');}catch(e){}if($('cookieBar'))$('cookieBar').style.display='none';}twBuild(el,src,config);};el.appendChild(box);}
+
+/* ---- Navigation ---- */
+let chartsLoaded=false;
+function setBase(base){
+ BASE=base;FILTER='all';
+ document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.f==='all'));
+ if(base==='ETF'){$('listHead').innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> ETFs auswählen';$('listSub').innerHTML='Nur ETFs – breit gestreut. Für Einzelaktien oben auf „<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 011-1h9a1 1 0 011 1v15"/><path d="M16 20V9h2a1 1 0 011 1v10"/><path d="M4 20h16"/><path d="M8 7h2M8 11h2M8 15h2"/></svg> Aktien" wechseln.';}
+ else{$('listHead').innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 011-1h9a1 1 0 011 1v15"/><path d="M16 20V9h2a1 1 0 011 1v10"/><path d="M4 20h16"/><path d="M8 7h2M8 11h2M8 15h2"/></svg> Aktien auswählen';$('listSub').innerHTML='Nur Einzelaktien – mehr Chance & Risiko. Für ETFs oben auf „<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> ETFs" wechseln.';}
+ if(ASSETS[SEL].type!==base){const i=ASSETS.findIndex(a=>a.type===base);if(i>=0)SEL=i;}
+ renderList();update();
+}
+function showView(v,base,tabEl){
+ document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+ $('view-'+v).classList.add('active');
+ if(tabEl)tabEl.classList.add('active');
+ else{const t=base?document.querySelector('.tab[data-base="'+base+'"]'):document.querySelector('.tab[data-v="'+v+'"]');if(t)t.classList.add('active');}
+ if(base)setBase(base);
+ window.scrollTo({top:0,behavior:'smooth'});
+ if(v==='charts'&&!chartsLoaded){initCharts();chartsLoaded=true;}
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showView(t.dataset.v,t.dataset.base,t));document.querySelectorAll('.groupbtn').forEach(function(b){b.onclick=function(e){e.stopPropagation();var g=b.parentElement,op=g.classList.contains('open');document.querySelectorAll('.navgroup').forEach(function(x){x.classList.remove('open');});if(!op)g.classList.add('open');};});document.addEventListener('click',function(){document.querySelectorAll('.navgroup').forEach(function(x){x.classList.remove('open');});});
+
+/* ---- Live-Charts-Seite ---- */
+function initCharts(){
+ // Top-Mover (größte Gewinner/Verlierer heute)
+ twWidget($('topMovers'),'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js',
+  {colorTheme:twTheme(),dateRange:"1D",exchange:"US",showChart:true,locale:"de_DE",largeChartUrl:"",isTransparent:true,
+   showSymbolLogo:true,showFloatingTooltip:false,width:"100%",height:430});
+ // Große Märkte – aufgeräumter Overview mit Umschalt-Tabs (einsteigerfreundlich)
+ twWidget($('bigChart'),'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js',
+  {symbols:[["S&P 500","AMEX:SPY|12M"],["NASDAQ 100","NASDAQ:QQQ|12M"],["MSCI World","XETR:EUNL|12M"],
+    ["DAX 40","XETR:DAX|12M"],["Euro Stoxx 600","XETR:EXSA|12M"],["Gold","AMEX:GLD|12M"]],
+   chartOnly:false,width:"100%",height:420,locale:"de_DE",colorTheme:twTheme(),autosize:false,showVolume:false,
+   showMA:false,lineWidth:2,fontColor:"#787b86",gridLineColor:"rgba(120,130,145,.12)",isTransparent:true,dateRanges:["1d|1","1m|30","12m|1D","60m|1W"]});
+ const majors=[["S&P 500","AMEX:SPY"],["NASDAQ 100","NASDAQ:QQQ"],["MSCI World","XETR:EUNL"],["DAX 40","XETR:DAX"],
+  ["Euro Stoxx 600","XETR:EXSA"],["Emerging Markets","AMEX:EEM"],["Gold","AMEX:GLD"],["Apple","NASDAQ:AAPL"],["Allianz","XETR:ALV"]];
+ const g=$('chartGrid');g.innerHTML='';
+ majors.forEach(m=>{const d=document.createElement('div');d.className='twwrap';d.style.height='220px';d.style.margin='0';g.appendChild(d);
+  twWidget(d,'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js',
+   {symbol:m[1],width:"100%",height:220,locale:"de_DE",dateRange:"12M",colorTheme:twTheme(),isTransparent:true,autosize:false,chartOnly:false});});
+}
+
+/* ---- Autovervollständigung ---- */
+function attachAutocomplete(input,list,onPick){
+ let items=[],hl=-1;
+ function render(){
+  const q=input.value.trim().toLowerCase();
+  if(!q){list.classList.remove('show');return;}
+  items=SUGGEST.filter(s=>s.name.toLowerCase().includes(q)||s.sym.toLowerCase().includes(q)).slice(0,10);
+  if(!items.length){list.classList.remove('show');return;}
+  list.innerHTML=items.map((s,i)=>`<div class="acitem${i===hl?' hl':''}" data-i="${i}">
+    <span><span class="nm">${s.name}</span> <span class="mt">${s.meta}</span></span><span class="sy">${s.sym}</span></div>`).join('');
+  list.classList.add('show');
+  list.querySelectorAll('.acitem').forEach(el=>el.onclick=()=>{onPick(items[+el.dataset.i]);list.classList.remove('show');});
+ }
+ input.addEventListener('input',()=>{hl=-1;render();});
+ input.addEventListener('keydown',e=>{
+  if(!list.classList.contains('show')){if(e.key==='Enter'&&input.value.trim())onPick({name:input.value.trim().toUpperCase(),sym:input.value.trim().toUpperCase(),idx:-1});return;}
+  if(e.key==='ArrowDown'){hl=Math.min(hl+1,items.length-1);render();e.preventDefault();}
+  else if(e.key==='ArrowUp'){hl=Math.max(hl-1,0);render();e.preventDefault();}
+  else if(e.key==='Enter'){e.preventDefault();if(hl>=0)onPick(items[hl]);else if(input.value.trim())onPick({name:input.value.trim().toUpperCase(),sym:input.value.trim().toUpperCase(),idx:-1});list.classList.remove('show');}
+  else if(e.key==='Escape')list.classList.remove('show');
+ });
+ document.addEventListener('click',e=>{if(!list.contains(e.target)&&e.target!==input)list.classList.remove('show');});
+}
+
+/* ---- Suche-Seite: Ergebnis inline rendern ---- */
+function renderSearchResult(s){
+ track('searches');
+ const inList=s.idx>=0;
+ $('searchResult').innerHTML=`
+  <div class="card">
+    <div class="selname">${s.name}</div>
+    <div class="selsub" style="margin-bottom:12px">Symbol: ${s.sym}${inList?' · in Liste – volle Sparplan-Hochrechnung möglich':''}</div>
+    <div class="wlabel">Live-Chart <span class="info" data-tip="Kursverlauf über die Zeit. Linie hoch = Wert gestiegen, runter = gefallen. Zeitraum oben umstellbar.">i</span></div>
+    <div class="twwrap" id="srChart" style="height:400px"></div>
+    <div class="grid2">
+      <div><div class="wlabel">Übersicht <span class="info" data-tip="Aktueller Kurs, Handelswährung, Börse und Basisdaten zum Wert.">i</span></div><div class="twwrap" id="srInfo" style="min-height:180px"></div></div>
+      <div><div class="wlabel">Technische Analyse <span class="info r" data-tip="Automatische Einschätzung (Kaufen/Neutral/Verkaufen) aus vielen Kurs-Indikatoren. Nur ein rechnerisches Signal aus der Vergangenheit – keine Empfehlung, keine Garantie.">i</span></div><div class="twwrap" id="srTech" style="min-height:400px"></div></div>
+    </div>
+    <div class="wlabel">Profil <span class="info" data-tip="Beschreibung des Unternehmens bzw. Fonds: Branche, Land und wichtige Eckdaten.">i</span></div>
+    <div class="twwrap" id="srProfile" style="min-height:340px"></div>
+    ${inList?`<button class="sidebtn" style="max-width:340px" onclick="useForPlan(${s.idx})"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9.2a3.5 3.5 0 100 5.6"/><path d="M7 11h6M7 13.2h5"/></svg> In den Sparplan-Rechner übernehmen</button>`:
+      `<div class="expl">Für diesen Wert liegen keine historischen Kennzahlen vor – wähle einen vergleichbaren Typ, dann rechnet das System ihn mit passenden Schätzwerten (≈) durch. Du musst keine Zahlen eingeben:<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="dbtn planbtn" data-profile="etf">wie breiter ETF</button><button class="dbtn planbtn" data-profile="div">wie Dividendenwert</button><button class="dbtn planbtn" data-profile="growth">wie Wachstumswert</button><button class="dbtn planbtn" data-profile="defensive">wie defensiv</button></div></div>`}
+  </div>`;
+ twWidget($('srChart'),'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js',
+  {symbol:s.sym,width:"100%",height:400,locale:"de_DE",interval:"D",timezone:"Europe/Berlin",theme:twTheme(),style:"3",hide_side_toolbar:true,hide_legend:false,withdateranges:true,allow_symbol_change:true,save_image:false,details:false});
+ twWidget($('srInfo'),'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js',{symbol:s.sym,width:"100%",locale:"de_DE",colorTheme:twTheme(),isTransparent:true});
+ twWidget($('srTech'),'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js',{symbol:s.sym,width:"100%",height:400,interval:"1M",locale:"de_DE",colorTheme:twTheme(),isTransparent:true,showIntervalTabs:true});
+ twWidget($('srProfile'),'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js',{symbol:s.sym,width:"100%",height:340,locale:"de_DE",colorTheme:twTheme(),isTransparent:true});
+ $('searchResult').querySelectorAll('.planbtn').forEach(b=>b.onclick=()=>planAny(s.name,s.sym,b.dataset.profile));
+ if(typeof a11yEnhance==='function')a11yEnhance();$('searchResult').scrollIntoView({behavior:'smooth'});
+}
+let TEMPIDX=-1;
+function planAny(name,sym,profile){
+ const P=({etf:{type:'ETF',mean:8,vol:15,div:2.0,label:'breiter ETF'},div:{type:'Aktie',mean:7,vol:18,div:4.0,label:'Dividendenwert'},growth:{type:'Aktie',mean:15,vol:30,div:0.5,label:'Wachstumswert'},defensive:{type:'Aktie',mean:7,vol:14,div:2.5,label:'defensiv'}})[profile]||{type:'Aktie',mean:9,vol:30,div:1.5,label:'Einzelaktie'};
+ const a={name:name+' (≈ '+P.label+')',sym:sym,type:P.type,region:'geschätzt',mean:P.mean,vol:P.vol,div:P.div,est:true};a.hmean=a.mean;a.emean=+(a.mean*0.8).toFixed(1);
+ if(TEMPIDX>=0&&TEMPIDX<ASSETS.length){ASSETS[TEMPIDX]=a;}else{ASSETS.push(a);TEMPIDX=ASSETS.length-1;}
+ SEL=TEMPIDX;
+ const tab=document.querySelector('.tab[data-base="'+P.type+'"]');
+ showView('rechner',P.type,tab); update();
+}
+function useForPlan(i){SEL=i;const base=ASSETS[i].type;const tab=document.querySelector('.tab[data-base="'+base+'"]');showView('rechner',base,tab);update();}
+
+/* ---- Rechner: Liste ---- */
+let SEL=0,BASE='ETF',FILTER='all',SORT={k:'mean',dir:-1};
+function matchFilter(a){if(a.type!==BASE)return false;if(FILTER==='fav')return FAVS.indexOf(a.sym)>=0;if(FILTER==='div')return a.div>=3;if(FILTER==='sicher')return a.vol<=9;return true;}
+var FAVS=(function(){try{return JSON.parse(localStorage.getItem('nms_favs'))||[];}catch(e){return[];}})();
+var STAR='<svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M12 3l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 17l-5.2 2.7 1-5.8L3.6 9.9l5.8-.8z"/></svg>';
+function toggleFav(sym){var i=FAVS.indexOf(sym);if(i>=0)FAVS.splice(i,1);else FAVS.push(sym);try{localStorage.setItem('nms_favs',JSON.stringify(FAVS));}catch(e){}renderList();}
+function buildRow(a,tb){const rc=riskClass(a.vol);const tr=document.createElement('tr');if(a.i===SEL)tr.className='sel';
+ tr.innerHTML=`<td><span class="favstar${FAVS.indexOf(a.sym)>=0?' on':''}" data-sym="${a.sym}" role="button" tabindex="0" aria-label="Merken">${STAR}</span> ${a.name}<br><span class="tag">${a.region}</span></td><td><span class="tag">${a.type}</span></td>
+  <td>${pct(a.mean)}</td><td class="${a.div>=3?'goldc':''}">${pct(a.div)}</td><td>${pct(a.vol)}</td>
+  <td><span class="rc" style="background:${RC_COLOR[rc]}">${rc}</span></td><td><button class="dbtn" data-d="${a.i}">Details <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></td>`;
+ const tds=tr.querySelectorAll('td');
+ for(let n=0;n<6;n++)tds[n].onclick=()=>{SEL=a.i;track('assetSelects');renderList();update();};
+ var _st=tr.querySelector('.favstar');if(_st)_st.onclick=function(e){e.stopPropagation();toggleFav(a.sym);};
+ tr.querySelector('.dbtn').onclick=e=>{e.stopPropagation();SEL=a.i;renderList();update();openModal();};
+ tb.appendChild(tr);}
+function groupHeader(tb,txt){const tr=document.createElement('tr');tr.className='grouphdr';
+ tr.innerHTML=`<td colspan="7">${txt}</td>`;tb.appendChild(tr);}
+function renderList(){
+ const q=$('search').value.trim().toLowerCase();
+ const k=SORT.k;
+ const sortFn=(a,b)=>{if(k==='name'||k==='type')return SORT.dir*((''+a[k]).localeCompare(''+b[k]));
+  let av=k==='rc'?riskClass(a.vol):a[k],bv=k==='rc'?riskClass(b.vol):b[k];return SORT.dir*(av>bv?1:av<bv?-1:0);};
+ let rows=ASSETS.map((a,i)=>({...a,i})).filter(a=>matchFilter(a)&&(a.name.toLowerCase().includes(q)||a.region.toLowerCase().includes(q)));
+ const etfs=rows.filter(a=>a.type==='ETF').sort(sortFn);
+ const stocks=rows.filter(a=>a.type==='Aktie').sort(sortFn);
+ const tb=$('assetBody');tb.innerHTML='';
+ if(etfs.length){groupHeader(tb,`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V8"/><path d="M17 20v-9"/></svg> ETFs · breit gestreut, für Einsteiger meist ruhiger (${etfs.length})`);etfs.forEach(a=>buildRow(a,tb));}
+ if(stocks.length){groupHeader(tb,`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 011-1h9a1 1 0 011 1v15"/><path d="M16 20V9h2a1 1 0 011 1v10"/><path d="M4 20h16"/><path d="M8 7h2M8 11h2M8 15h2"/></svg> Einzelaktien · einzelne Firmen, mehr Chance &amp; Risiko (${stocks.length})`);stocks.forEach(a=>buildRow(a,tb));}
+ if(!etfs.length&&!stocks.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="7" style="padding:16px;color:var(--muted)">Keine Treffer.</td>';tb.appendChild(tr);}
+}
+function renderMini(a){twWidget($('miniChart'),'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js',
+ {symbol:a.sym,width:"100%",height:230,locale:"de_DE",dateRange:"12M",colorTheme:twTheme(),isTransparent:true,autosize:false,chartOnly:false});}
+
+let chart;
+function _gauss(){var u=1-Math.random(),w=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w);}
+function update(){
+ const a=ASSETS[SEL];const rate=+$('rate').value||0,start=+$('start').value||0,years=+$('years').value;
+ const infl=$('infl').checked,inflR=infl?0.02:0,reinvest=$('reinvest').checked;$('yearsLbl').textContent=years;
+ const _tax=$("tax")&&$("tax").checked;let rExp=reinvest?a.mean:Math.max(0,a.mean-a.div);if(_tax)rExp=Math.max(-6,rExp-(a.ter||0));const vol=a.vol,rc=riskClass(vol);
+ $('selName').textContent=a.name;
+ $('selSub').innerHTML=`${a.type} · ${a.region} · Ø ${pct(a.mean)} p.a. · Schwankung ${pct(vol)} · Dividende ${pct(a.div)}`;
+ $('liveName').textContent=a.name.split(' (')[0];renderMini(a);
+ $('rClass').innerHTML=`<span class="rc" style="background:${RC_COLOR[rc]};font-size:18px;padding:2px 12px">${rc}</span> <span style="font-size:15px">von 7 · ${RC_LABEL[rc]}</span>`;
+ $('rPin').style.left=((rc-1)/6*100)+'%';
+ const sd=vol/Math.sqrt(Math.max(years,1));
+ const pLoss=normCdf((0-a.mean)/sd)*100,pInfl=(1-normCdf((2-a.mean)/sd))*100;
+ const need=neededReturn(start,rate,years,2),pDouble=(1-normCdf((need-a.mean)/sd))*100;
+ $('pLoss').textContent=pct0(Math.min(100,Math.max(0,pLoss)));$('pLoss').style.color=pLoss>25?'var(--down)':pLoss>10?'var(--gold)':'var(--up)';
+ $('pInfl').textContent=pct0(Math.min(100,Math.max(0,pInfl)));$('pInfl').style.color='var(--up)';
+ $('pDouble').textContent=pct0(Math.min(100,Math.max(0,pDouble)));
+ const labels=[],invested=[],vExp=[],vLow=[],vHigh=[],vTG=[],rows=[];let divTotal=0;
+ const _grow=($('dyn')&&$('dyn').checked)?((+$('dynPct').value||0)/100):0;
+ const _tgR=+($('tgRate')?$('tgRate').value:2)||0;
+ function _simTo(annual,ty){const rm=annual/100/12;let v=start,cur=rate;for(let yy=1;yy<=ty;yy++){for(let m=0;m<12;m++){v+=cur;v*=(1+rm);}cur*=(1+_grow);}return v;}
+ function _invTo(ty){let inv=start,cur=rate;for(let yy=1;yy<=ty;yy++){inv+=cur*12;cur*=(1+_grow);}return inv;}
+ for(let y=0;y<=years;y++){const band=Z*vol/Math.sqrt(Math.max(y,1));
+  const rLow=Math.max(-6,rExp-band),rHigh=rExp+band,defl=infl?Math.pow(1+inflR,y):1;
+  const inv=_invTo(y);
+  const e=_simTo(rExp,y)/defl,l=_simTo(rLow,y)/defl,h=_simTo(rHigh,y)/defl,tg=_simTo(_tgR,y)/defl;
+  const divY=e*a.div/100;if(y>0)divTotal+=divY;
+  labels.push(y+'');invested.push(Math.round(inv));vExp.push(Math.round(e));vLow.push(Math.round(l));vHigh.push(Math.round(h));vTG.push(Math.round(tg));
+  if(y>0)rows.push({y,inv,e,l,h,gain:e-inv,gpct:inv>0?(e-inv)/inv*100:0,divY});}
+ const totalInv=invested[years],endE=vExp[years],gain=endE-totalInv,dYear=endE*a.div/100;const _t=g=>_tax?Math.max(0,(g-totalInv-1000))*0.264:0;const showEnd=endE-_t(endE),showGain=showEnd-totalInv,showLow=vLow[years]-_t(vLow[years]),showHigh=vHigh[years]-_t(vHigh[years]);
+ $('dYear').textContent=eur(dYear);$('dTotal').textContent=eur(divTotal);$('dMonth').textContent=eur(dYear/12);
+ const dr=a.div>=4.5?['sehr hoch','var(--gold)']:a.div>=3?['überdurchschnittlich','var(--up)']:a.div>=1.5?['durchschnittlich','var(--neutral)']:a.div>0?['niedrig','var(--muted)']:['keine Dividende','var(--muted)'];
+ $('dRank').textContent=dr[0];$('dRank').style.color=dr[1];
+ $('kInvest').textContent=eur(totalInv);$('kValue').textContent='≈ '+eur(showEnd);
+ $('kValuePct').textContent=(infl?'infl.-ber. · ':'')+(_tax?'n. Steuer/Kosten · ':'')+'wahrsch. '+eur(showLow)+' – '+eur(showHigh);
+ $('kGain').textContent=eur(showGain);$('kGainPct').textContent='+ '+pct(totalInv>0?showGain/totalInv*100:0);
+ $('kRet').textContent=pct(rExp);$('kRetSub').textContent=reinvest?'inkl. reinv. Dividenden':'Kursrendite';
+ $('quickFacts').innerHTML=`
+  <div class="qf"><span class="k">Erwartete Rendite</span><span class="v">${pct(a.mean)} p.a.</span></div>
+  <div class="qf"><span class="k">Dividende</span><span class="v goldc">${pct(a.div)}</span></div>
+  <div class="qf"><span class="k">Schwankung</span><span class="v">${pct(a.vol)}</span></div>
+  <div class="qf"><span class="k">Risikoklasse</span><span class="v"><span class="rc" style="background:${RC_COLOR[rc]}">${rc}</span> ${RC_LABEL[rc]}</span></div>`;
+ const tb=$('tbl').querySelector('tbody');tb.innerHTML='';
+ rows.forEach(r=>{const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${r.y}</td><td>${eur(r.inv)}</td><td><strong>${eur(r.e)}</strong></td><td class="green">${eur(r.gain)}</td>
+   <td class="green">${pct(r.gpct)}</td><td class="goldc">${eur(r.divY)}</td><td style="color:var(--down)">${eur(r.l)}</td><td style="color:var(--up)">${eur(r.h)}</td>`;tb.appendChild(tr);});
+ const ds=[
+  {label:'Optimistisch',data:vHigh,borderColor:'#3ba776',backgroundColor:'rgba(59,167,118,.08)',fill:'+1',tension:.25,pointRadius:0,borderWidth:1.5},
+  {label:'Erwartet',data:vExp,borderColor:'#4f9cf0',backgroundColor:'rgba(79,156,240,.10)',fill:false,tension:.25,pointRadius:0,borderWidth:2.5},
+  {label:'Pessimistisch',data:vLow,borderColor:'#e0685a',fill:false,tension:.25,pointRadius:0,borderWidth:1.5},
+  {label:'Eingezahlt',data:invested,borderColor:'#7a8aa0',borderDash:[6,4],fill:false,tension:0,pointRadius:0,borderWidth:1.5}];
+ if($('mcP50')){var _N=500,_ends=[],_mm=years*12,_sd=vol/100/Math.sqrt(12),_mu=rExp/100/12;for(var _s=0;_s<_N;_s++){var _v=start,_cur=rate;for(var _mo=1;_mo<=_mm;_mo++){_v+=_cur;_v*=(1+_mu+_sd*_gauss());if(_mo%12===0)_cur*=(1+_grow);}_ends.push(_v);}_ends.sort(function(x,y){return x-y;});var _q=function(p){return _ends[Math.min(_ends.length-1,Math.floor(p*_ends.length))];};var _pos=0;for(var _i=0;_i<_ends.length;_i++)if(_ends[_i]>totalInv)_pos++;$('mcP10').textContent='≈ '+eur(_q(0.10));$('mcP50').textContent='≈ '+eur(_q(0.50));$('mcP90').textContent='≈ '+eur(_q(0.90));$('mcPos').textContent=Math.round(_pos/_N*100)+' %';}ds.push({label:'Tagesgeld',data:vTG,borderColor:'#7f8c9a',borderDash:[2,3],fill:false,tension:0,pointRadius:0,borderWidth:1.5});if($('tgNote'))$('tgNote').innerHTML='Zum Vergleich <strong>Tagesgeld ('+pct(_tgR)+')</strong>: ≈ '+eur(vTG[years])+' &nbsp;·&nbsp; <strong style="color:var(--up)">Vorsprung durch Anlegen: +'+eur(Math.max(0,vExp[years]-vTG[years]))+'</strong>';if(chart){chart.data.labels=labels;chart.data.datasets=ds;chart.update();}
+ else chart=new Chart($('chart'),{type:'line',data:{labels,datasets:ds},options:{responsive:true,interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>'Jahr '+i[0].label,label:c=>c.dataset.label+': '+eur(c.parsed.y)}}},
+  scales:{x:{title:{display:true,text:'Jahre',color:'#93a4b5'},grid:{color:'#22303d'},ticks:{color:'#93a4b5'}},
+   y:{grid:{color:'#22303d'},ticks:{color:'#93a4b5',callback:v=>eur(v)}}}}});
+}
+
+/* ---- Detail-Modal ---- */
+function explain(a){const rc=riskClass(a.vol),isETF=a.type==='ETF',growth=a.mean>=12,divStark=a.div>=3.5,defensiv=a.vol<=9;
+ let art=isETF?`Ein <strong>ETF</strong> bündelt viele Wertpapiere in einem Papier – breit gestreutes Risiko.`
+  :`Eine <strong>Einzelaktie</strong> ist ein Anteil an genau einem Unternehmen – Chancen und Risiken konzentriert (<em>Klumpenrisiko</em>).`;
+ let ch=growth?`Eher <strong>wachstumsorientiert</strong>: höhere erwartete Rendite, stärkere Schwankungen, wenig Dividende.`
+  :divStark?`<strong>Dividendenstark</strong>: Fokus auf regelmäßige Ausschüttungen (${pct(a.div)}/Jahr).`
+  :defensiv?`<strong>Defensiv</strong>: geringe Schwankung, dafür geringere Rendite.`:`<strong>Ausgewogen</strong> zwischen Wachstum und Ausschüttung.`;
+ return `<h4>Was ist das?</h4><p>${art} ${ch}</p>
+  <h4>Kennzahlen erklärt</h4>
+  <p><strong>Ø Rendite ${pct(a.mean)} p.a.</strong> – langfristiger historischer Jahresdurchschnitt (inkl. Dividenden). Nur ein Mittelwert.</p>
+  <p><strong>Dividende ${pct(a.div)}</strong> – jährliche Ausschüttung. Bei ${eur(10000)} ≈ ${eur(10000*a.div/100)}/Jahr. Kann gekürzt werden.</p>
+  <p><strong>Schwankung ${pct(a.vol)}</strong> – wie stark der Kurs typischerweise ausschlägt (nach oben und unten).</p>
+  <p><strong>Risikoklasse ${rc}/7</strong> (EU-Standard) – „${RC_LABEL[rc]}". 1 = sehr sicher, 7 = sehr spekulativ.</p>
+  <h4>Worauf achten?</h4><p>${isETF?'Breite ETFs gelten langfristig als solide Basis.':'Einzelaktien eher als Beimischung – nicht alles auf eine Karte.'} Je länger der Horizont, desto mehr gleichen sich gute und schlechte Jahre aus.</p>
+  <p style="color:#8698a9;margin-top:10px">Live-Daten von TradingView – keine Anlageempfehlung.</p>`;}
+function openModal(){track('detailOpens');const a=ASSETS[SEL];$('mName').textContent=a.name;$('mSub').innerHTML=`${a.type} · ${a.region} · Symbol: ${a.sym}`;
+ twWidget($('mAdvChart'),'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js',
+  {symbol:a.sym,width:"100%",height:400,locale:"de_DE",interval:"D",timezone:"Europe/Berlin",theme:twTheme(),style:"3",hide_side_toolbar:true,hide_legend:false,withdateranges:true,allow_symbol_change:true,save_image:false,details:false});
+ twWidget($('mSymInfo'),'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js',{symbol:a.sym,width:"100%",locale:"de_DE",colorTheme:twTheme(),isTransparent:true});
+ twWidget($('mTech'),'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js',{symbol:a.sym,width:"100%",height:400,interval:"1M",locale:"de_DE",colorTheme:twTheme(),isTransparent:true,showIntervalTabs:true});
+ twWidget($('mProfile'),'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js',{symbol:a.sym,width:"100%",height:340,locale:"de_DE",colorTheme:twTheme(),isTransparent:true});
+ $('mExpl').innerHTML=explain(a);$('modal').classList.add('open');document.body.style.overflow='hidden';if(typeof a11yEnhance==='function')a11yEnhance();var _cb=$('closeModal');if(_cb)_cb.focus();}
+function closeModal(){$('modal').classList.remove('open');document.body.style.overflow='';}
+
+/* ---- Events ---- */
+$('search').addEventListener('input',renderList);
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');FILTER=c.dataset.f;renderList();});
+document.querySelectorAll('table.assets th').forEach(th=>th.onclick=()=>{const k=th.dataset.s;if(!k)return;if(SORT.k===k)SORT.dir*=-1;else{SORT.k=k;SORT.dir=(k==='name'||k==='type')?1:-1;}renderList();});
+['rate','start','years','infl','reinvest','tax','dyn','dynPct','tgRate'].forEach(id=>$(id).addEventListener('input',update));
+$('openDetail').onclick=openModal;$('closeModal').onclick=closeModal;
+$('modal').onclick=e=>{if(e.target===$('modal'))closeModal();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+attachAutocomplete($('bigSearch'),$('bigAc'),renderSearchResult);
+
+/* ---- Startseite: Karten führen zu den Bereichen ---- */
+document.querySelectorAll('.hcard').forEach(c=>c.onclick=()=>showView(c.dataset.go,c.dataset.filter));
+
+/* ---- Speicher-Helfer (localStorage mit Fallback) ---- */
+function store(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+
+/* ---- Hell/Dunkel-Umschalter ---- */
+function applyTheme(light){document.body.classList.toggle('light',light);
+ $('themeBtn').innerHTML=light?'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg> Hell':'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8 8 0 1111.2 3a6.5 6.5 0 009.8 9.8z"/></svg> Dunkel';store('theme',light?'light':'dark');
+ // sichtbare TradingView-Widgets neu laden, damit sie zum Theme passen
+ if(document.getElementById('view-rechner'))renderMini(ASSETS[SEL]);
+ if(chartsLoaded)initCharts();
+ if($('modal').classList.contains('open'))openModal();
+ if(chart){const c=light?'#c9d4de':'#22303d',t=light?'#5b6b7a':'#93a4b5';
+  chart.options.scales.x.grid.color=c;chart.options.scales.y.grid.color=c;
+  chart.options.scales.x.ticks.color=t;chart.options.scales.y.ticks.color=t;
+  chart.options.scales.x.title.color=t;chart.update();}
+}
+$('themeBtn').onclick=()=>applyTheme(!document.body.classList.contains('light'));
+function applyDataMode(mode){DATAMODE=mode;ASSETS.forEach(a=>{if(a.hmean==null)a.hmean=a.mean;a.mean=(mode==='expert'&&a.emean!=null)?a.emean:a.hmean;});$('dataBtn').textContent=mode==='expert'?'Daten: Experten-Prognose':'Daten: Historisch';$('dataBtn').style.borderColor=mode==='expert'?'var(--accent)':'';store('datamode',mode);renderList();update();if(typeof renderCombos==='function')renderCombos();if(typeof updatePortfolio==='function')updatePortfolio();}
+$('dataBtn').onclick=()=>applyDataMode(DATAMODE==='expert'?'hist':'expert');
+applyTheme(load('theme')==='light');
+
+/* ---- Cookie-Hinweis ---- */
+function initCookies(){
+ if(!load('cookieChoice'))$('cookieBar').style.display='block';
+ $('cookieAll').onclick=()=>{store('cookieChoice','all');$('cookieBar').style.display='none';refreshTW();};
+ $('cookieNecessary').onclick=()=>{store('cookieChoice','necessary');$('cookieBar').style.display='none';};
+}
+
+/* ---- Zustimmungs-Gate (rechtliche Hinweise) ---- */
+$('consentCheck').onchange=e=>{const b=$('consentBtn');b.disabled=!e.target.checked;
+ b.style.opacity=e.target.checked?'1':'.5';b.style.cursor=e.target.checked?'pointer':'not-allowed';};
+$('consentLegal').onclick=e=>{e.preventDefault();showView('legal');};
+$('consentBtn').onclick=()=>{store('consentAccepted','1');$('consentGate').style.display='none';document.body.style.overflow='';initCookies();if(!load('onboarded')&&typeof showOnboard==='function')showOnboard();};
+if(load('consentAccepted')==='1'){$('consentGate').style.display='none';initCookies();}
+else{document.body.style.overflow='hidden';}
+
+/* ===== Analytics (lokal, nur auf diesem Gerät) ===== */
+function getStats(){try{return JSON.parse(load('nms_stats'))||{};}catch(e){return {};}}
+function saveStats(s){store('nms_stats',JSON.stringify(s));}
+function track(key){const s=getStats();s[key]=(s[key]||0)+1;saveStats(s);}
+(function(){const s=getStats();s.visits=(s.visits||0)+1;s.lastVisit=new Date().toLocaleString('de-DE');saveStats(s);})();
+document.addEventListener('click',()=>track('clicks'));
+function clamp(x){return Math.min(100,Math.max(0,x));}
+
+/* ===== Portfolio ===== */
+let PORT=[],PENDING=null,pChart=null;
+function estimateStats(s){
+ if(s.idx>=0){const a=ASSETS[s.idx];return {name:a.name,sym:a.sym,type:a.type,mean:a.mean,vol:a.vol,div:a.div,est:false};}
+ return {name:s.name,sym:s.sym,type:'Aktie',mean:9,vol:30,div:1.5,est:true};
+}
+attachAutocomplete($('pSearch'),$('pAc'),s=>{PENDING=estimateStats(s);$('pPick').textContent=PENDING.name+(PENDING.est?' (≈ geschätzt)':'');$('pSearch').value=s.name;});
+$('pAdd').onclick=()=>{if(!PENDING){alert('Bitte zuerst oben einen Wert suchen und auswählen.');return;}
+ const amt=+$('pAmt').value||0;PORT.push({...PENDING,amt});PENDING=null;$('pPick').textContent='– bitte oben suchen –';$('pSearch').value='';track('portfolioAdds');renderPort();updatePortfolio();};
+$('pClear').onclick=()=>{PORT=[];renderPort();updatePortfolio();};
+
+function renderPort(){
+ const tb=$('pBody');tb.innerHTML='';const total=PORT.reduce((s,p)=>s+p.amt,0)||1;
+ PORT.forEach((p,i)=>{const rc=riskClass(p.vol);const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${p.name}${p.est?' <span class="tag">≈</span>':''}<br><span class="tag">${p.type}</span></td>
+   <td>${eur(p.amt)}</td><td>${Math.round(p.amt/total*100)} %</td><td>${pct(p.mean)}</td>
+   <td class="${p.div>=3?'goldc':''}">${pct(p.div)}</td><td><span class="rc" style="background:${RC_COLOR[rc]}">${rc}</span></td>
+   <td><button class="dbtn" style="border-color:var(--down);color:var(--down)">✕</button></td>`;
+  tr.querySelector('.dbtn').onclick=()=>{PORT.splice(i,1);renderPort();updatePortfolio();};
+  tb.appendChild(tr);});
+ if(!PORT.length)tb.innerHTML='<tr><td colspan="7" style="padding:16px;color:var(--muted)">Noch keine Positionen. Oben einen Wert suchen und hinzufügen.</td></tr>';
+}
+
+function updatePortfolio(){
+ const years=+$('pYears').value;$('pYearsLbl').textContent=years;
+ const start=+$('pStart').value||0,infl=$('pInfl').checked,inflR=infl?0.02:0,reinvest=$('pReinvest').checked;
+ const total=PORT.reduce((s,p)=>s+p.amt,0);
+ if(!PORT.length||total<=0){['pkRate','pkInvest','pkValue','pkGain'].forEach(id=>$(id).textContent='–');
+  $('pCombSub').textContent='Füge Positionen hinzu, um die Gesamtberechnung zu sehen.';
+  $('prClass').textContent='–';['ppLoss','ppInfl','ppDouble','pdYear','pdMonth','pdAvg'].forEach(id=>$(id).textContent='–');
+  if(pChart){pChart.destroy();pChart=null;}return;}
+ const rBlend=PORT.reduce((s,p)=>s+p.amt*p.mean,0)/total;
+ const divBlend=PORT.reduce((s,p)=>s+p.amt*p.div,0)/total;
+ const volBlend=PORT.reduce((s,p)=>s+p.amt*p.vol,0)/total;
+ const volComb=PORT.length>1?volBlend*0.9:volBlend;
+ const _ptax=$("pTax")&&$("pTax").checked;const terBlend=PORT.reduce((s,p)=>s+p.amt*(p.ter||0),0)/total;const rc=riskClass(volComb);let rExp=reinvest?rBlend:Math.max(0,rBlend-divBlend);if(_ptax)rExp=Math.max(-6,rExp-terBlend);
+ $('pCombSub').innerHTML=`${PORT.length} Positionen · ${eur(total)}/Monat · Ø Rendite ${pct(rBlend)} p.a. · Schwankung ${pct(volComb)} · Dividende ${pct(divBlend)}`;
+ $('prClass').innerHTML=`<span class="rc" style="background:${RC_COLOR[rc]};font-size:18px;padding:2px 12px">${rc}</span> <span style="font-size:15px">von 7 · ${RC_LABEL[rc]}</span>`;
+ $('prPin').style.left=((rc-1)/6*100)+'%';
+ const sd=volComb/Math.sqrt(Math.max(years,1));
+ const pLoss=normCdf((0-rBlend)/sd)*100,pInfl=(1-normCdf((2-rBlend)/sd))*100;
+ const need=neededReturn(start,total,years,2),pDouble=(1-normCdf((need-rBlend)/sd))*100;
+ $('ppLoss').textContent=pct0(clamp(pLoss));$('ppLoss').style.color=pLoss>25?'var(--down)':pLoss>10?'var(--gold)':'var(--up)';
+ $('ppInfl').textContent=pct0(clamp(pInfl));$('ppInfl').style.color='var(--up)';
+ $('ppDouble').textContent=pct0(clamp(pDouble));
+ const labels=[],invested=[],vExp=[],vLow=[],vHigh=[];
+ for(let y=0;y<=years;y++){const months=y*12,inv=start+total*months,band=Z*volComb/Math.sqrt(Math.max(y,1));
+  const rLow=Math.max(-6,rExp-band),rHigh=rExp+band,defl=infl?Math.pow(1+inflR,y):1;
+  labels.push(y+'');invested.push(Math.round(inv));
+  vExp.push(Math.round(project(start,total,rExp,months)/defl));
+  vLow.push(Math.round(project(start,total,rLow,months)/defl));
+  vHigh.push(Math.round(project(start,total,rHigh,months)/defl));}
+ const totalInv=invested[years],endE=vExp[years],gain=endE-totalInv,dYear=endE*divBlend/100;
+ $('pkRate').textContent=eur(total);$('pkInvest').textContent=eur(totalInv);$('pkInvestSub').textContent='nach '+years+' Jahren';
+ const _pt=g=>_ptax?Math.max(0,(g-totalInv-1000))*0.264:0;const pShowEnd=endE-_pt(endE);$('pkValue').textContent='≈ '+eur(pShowEnd);$('pkValueSub').textContent=(_ptax?'n. Steuer/Kosten · ':'')+'wahrsch. '+eur(vLow[years]-_pt(vLow[years]))+' – '+eur(vHigh[years]-_pt(vHigh[years]));
+ $('pkGain').textContent=eur(pShowEnd-totalInv);$('pkGainSub').textContent='+ '+pct(totalInv>0?(pShowEnd-totalInv)/totalInv*100:0);
+ $('pdYear').textContent=eur(dYear);$('pdMonth').textContent=eur(dYear/12);$('pdAvg').textContent=pct(divBlend);
+ const ds=[
+  {label:'Optimistisch',data:vHigh,borderColor:'#3ba776',backgroundColor:'rgba(59,167,118,.08)',fill:'+1',tension:.25,pointRadius:0,borderWidth:1.5},
+  {label:'Erwartet',data:vExp,borderColor:'#4f9cf0',backgroundColor:'rgba(79,156,240,.10)',fill:false,tension:.25,pointRadius:0,borderWidth:2.5},
+  {label:'Pessimistisch',data:vLow,borderColor:'#e0685a',fill:false,tension:.25,pointRadius:0,borderWidth:1.5},
+  {label:'Eingezahlt',data:invested,borderColor:'#7a8aa0',borderDash:[6,4],fill:false,tension:0,pointRadius:0,borderWidth:1.5}];
+ if(pChart){pChart.data.labels=labels;pChart.data.datasets=ds;pChart.update();}
+ else pChart=new Chart($('pChart'),{type:'line',data:{labels,datasets:ds},options:{responsive:true,interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>'Jahr '+i[0].label,label:c=>c.dataset.label+': '+eur(c.parsed.y)}}},
+  scales:{x:{title:{display:true,text:'Jahre',color:'#93a4b5'},grid:{color:'#22303d'},ticks:{color:'#93a4b5'}},
+   y:{grid:{color:'#22303d'},ticks:{color:'#93a4b5',callback:v=>eur(v)}}}}});
+}
+['pYears','pStart','pInfl','pReinvest','pTax'].forEach(id=>$(id).addEventListener('input',updatePortfolio));
+
+/* Portfolio speichern/laden */
+function getPortfolios(){try{return JSON.parse(load('nms_portfolios'))||{};}catch(e){return {};}}
+$('pSave').onclick=()=>{if(!PORT.length){alert('Erst Positionen hinzufügen.');return;}
+ const name=($('pName').value.trim())||('Portfolio '+(Object.keys(getPortfolios()).length+1));
+ const all=getPortfolios();all[name]=PORT;store('nms_portfolios',JSON.stringify(all));track('saves');$('pName').value='';renderSaved();};
+function renderSaved(){const all=getPortfolios(),names=Object.keys(all),box=$('pSaved');
+ if(!names.length){box.innerHTML='<div class="selsub">Noch keine gespeicherten Portfolios.</div>';return;}
+ box.innerHTML='<div class="selsub" style="margin-bottom:6px">Gespeicherte Portfolios:</div>'+names.map(n=>
+  `<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span style="flex:1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a1 1 0 011-1h4l2 2h7a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1z"/></svg> ${n} <span class="selsub">(${all[n].length} Werte)</span></span>
+   <button class="dbtn" data-load="${encodeURIComponent(n)}">Laden</button>
+   <button class="dbtn" data-del="${encodeURIComponent(n)}" style="border-color:var(--down);color:var(--down)">Löschen</button></div>`).join('');
+ box.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{PORT=JSON.parse(JSON.stringify(all[decodeURIComponent(b.dataset.load)]));renderPort();updatePortfolio();});
+ box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const a=getPortfolios();delete a[decodeURIComponent(b.dataset.del)];store('nms_portfolios',JSON.stringify(a));renderSaved();});
+}
+
+/* ===== Admin (versteckt) ===== */
+const ADMIN_CODE='nms';let logoClicks=0;
+function openAdmin(){showView('admin');}
+function renderAdmin(){const s=getStats(),ports=Object.keys(getPortfolios()).length;
+ $('adminGate').style.display='none';$('adminContent').style.display='block';
+ $('adminContent').innerHTML=`<div class="card"><h2>Nutzungszahlen (dieses Gerät)</h2>
+  <div class="qf"><span class="k">Aufrufe &ndash; ALLE Besucher (GoatCounter)</span><span class="v" id="gcTotal">${GC_CODE?'l\u00e4dt\u2026':'nicht aktiviert'}</span></div><div class="qf"><span class="k">Seitenaufrufe &ndash; nur dieses Ger&auml;t</span><span class="v">${s.visits||0}</span></div>
+  <div class="qf"><span class="k">Klicks gesamt</span><span class="v">${s.clicks||0}</span></div>
+  <div class="qf"><span class="k">Werte ausgewählt</span><span class="v">${s.assetSelects||0}</span></div>
+  <div class="qf"><span class="k">Detail-Ansichten geöffnet</span><span class="v">${s.detailOpens||0}</span></div>
+  <div class="qf"><span class="k">Suchen</span><span class="v">${s.searches||0}</span></div>
+  <div class="qf"><span class="k">Portfolio-Positionen hinzugefügt</span><span class="v">${s.portfolioAdds||0}</span></div>
+  <div class="qf"><span class="k">Portfolios gespeichert</span><span class="v">${s.saves||0}</span></div>
+  <div class="qf"><span class="k">Gespeicherte Portfolios aktuell</span><span class="v">${ports}</span></div>
+  <div class="qf"><span class="k">Letzter Besuch</span><span class="v">${s.lastVisit||'–'}</span></div>
+  <button class="dbtn" id="adminReset" style="margin-top:12px;padding:9px 16px">Zähler zurücksetzen</button>
+  <div class="selsub" style="margin-top:12px">Diese Zahlen werden nur lokal in deinem Browser gespeichert und zählen nur dein eigenes Gerät. Für echte Besucherzahlen über alle Nutzer bräuchtest du ein Analyse-Tool (z. B. Plausible oder Google Analytics) – sag Bescheid, dann baue ich das ein.</div></div>`;
+ if(GC_CODE){fetch('https://'+GC_CODE+'.goatcounter.com/counter/TOTAL.json').then(function(r){return r.json();}).then(function(d){var el=document.getElementById('gcTotal');if(el)el.textContent=(d.count||d.count_unique||'\u2013');}).catch(function(){var el=document.getElementById('gcTotal');if(el)el.textContent='\u2014';});}$('adminReset').onclick=()=>{if(confirm('Alle Zähler zurücksetzen?')){store('nms_stats',JSON.stringify({visits:s.visits}));renderAdmin();}};
+}
+$('adminBtn').onclick=()=>{if($('adminPass').value===ADMIN_CODE)renderAdmin();else alert('Falscher Code.');};
+document.querySelector('.brand').style.cursor='pointer';
+document.querySelector('.brand').addEventListener('click',()=>{logoClicks++;if(logoClicks>=5){logoClicks=0;openAdmin();}setTimeout(()=>{logoClicks=0;},2000);});
+if(location.hash==='#admin')openAdmin();
+window.addEventListener('hashchange',()=>{if(location.hash==='#admin')openAdmin();});
+
+/* Footer-Links */
+document.querySelectorAll('.sitefoot a[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();showView(a.dataset.go);});
+$('footYear').textContent=new Date().getFullYear();
+
+/* Ladebildschirm ausblenden */
+window.addEventListener('load',()=>setTimeout(()=>$('loader').classList.add('hide'),350));
+setTimeout(()=>$('loader')&&$('loader').classList.add('hide'),2500);
+
+/* Teilen-Button (mit mehrfachem Fallback, damit immer etwas passiert) */
+$('shareBtn').onclick=async()=>{
+ const url=location.href;
+ const data={title:'InvestBlick',text:'Sparplan, Dividenden & Live-Charts – verständlich für Einsteiger',url};
+ try{if(navigator.share){await navigator.share(data);return;}}catch(e){if(e&&e.name==='AbortError')return;}
+ let copied=false;
+ try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(url);copied=true;}}catch(e){}
+ if(!copied){try{const t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.focus();t.select();copied=document.execCommand('copy');document.body.removeChild(t);}catch(e){}}
+ if(copied)alert('Link kopiert:\n'+url);
+ else prompt('Link zum Kopieren (Strg/Cmd+C):',url);
+};
+
+/* Service Worker – installierbare App / Offline */
+if('serviceWorker' in navigator){let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{if(r.update)r.update();}).catch(()=>{}));}
+
+/* ===== Beispiel-Kombinationen (4 Sicherheitsstufen) ===== */
+const TIERS=[
+ {level:"<span class='lvldot' style='background:#4f9cf0'></span> Mix · riskant & sicher kombiniert", desc:"Bewusst gemischt: eine chancenreiche (riskante) Aktie zusammen mit einem sicheren Anker – so gibt es Wachstums-Chance und trotzdem Stabilität.", combos:[
+   {title:"Chance + Anker", why:"Riskante KI-Aktie (Nvidia) + solide Dividendenaktie (J&J) + sicherer Anleihen-ETF.", items:[["Nvidia (NVDA)",34],["Johnson & Johnson (JNJ)",33],["Global Aggregate Anleihen-ETF",33]]},
+   {title:"Wachstum abgesichert", why:"Wachstumsaktie (Apple) + defensive Aktie (Nestlé) + sicherer Geldmarkt.", items:[["Apple (AAPL)",34],["Nestlé",33],["Geldmarkt / Tagesgeld-nah",33]]},
+   {title:"Hoch & Fels", why:"Sehr riskant (Tesla) abgefedert durch stabile Aktie (Coca-Cola) und Staatsanleihen.", items:[["Tesla (TSLA)",34],["Coca-Cola (KO)",33],["Euro Staatsanleihen-ETF",33]]},
+   {title:"Zukunft & Sicherheit", why:"Halbleiter-Chance (SMH) + Basiskonsum (Procter & Gamble) + Gold als Stabilisator.", items:[["VanEck Semiconductor (SMH)",34],["Procter & Gamble (PG)",33],["Gold (ETC)",33]]},
+ ]},
+ {level:"<span class='lvldot' style='background:#3ba776'></span> Stufe 1 · Sehr sicher", desc:"Fokus auf Stabilität und wenig Schwankung – dafür geringere Rendite.", combos:[
+   {title:"Kapitalschutz-Mix", why:"Sehr schwankungsarm – Geld parken mit etwas Zins.", items:[["Geldmarkt / Tagesgeld-nah",40],["Euro Staatsanleihen-ETF",35],["Global Aggregate Anleihen-ETF",25]]},
+   {title:"Anleihen mit Prise Aktien", why:"Überwiegend Anleihen, kleiner Aktien-/Goldanteil für etwas mehr Rendite.", items:[["Global Aggregate Anleihen-ETF",50],["Mischportfolio 60/40",30],["Gold (ETC)",20]]},
+ ]},
+ {level:"<span class='lvldot' style='background:#3ba776'></span> Stufe 2 · Sicher / konservativ", desc:"Solides Fundament mit Dividende und Anleihe-Puffer.", combos:[
+   {title:"Solide Weltbasis", why:"Ausgewogenes Fundament mit Dividende und Puffer.", items:[["Mischportfolio 60/40",40],["SPDR S&P Global Dividend Aristocrats",30],["Global Aggregate Anleihen-ETF",30]]},
+   {title:"Dividende defensiv", why:"Regelmäßige Ausschüttungen, abgesichert mit Anleihen und Gold.", items:[["SPDR S&P Global Dividend Aristocrats",40],["Unternehmensanleihen (IG)",35],["Gold (ETC)",25]]},
+ ]},
+ {level:"<span class='lvldot' style='background:#e0b64f'></span> Stufe 3 · Ausgewogen / mittel", desc:"Mehr Aktienchance, aber weiterhin mit Puffer – die gefragte Mitte aus Sicherheit und Rendite.", combos:[
+   {title:"Welt ausgewogen", why:"Breiter Aktienmarkt plus Dividende, mit Anleihe-Puffer.", items:[["MSCI World (Industrieländer)",40],["Vanguard FTSE All-World High Dividend",30],["Global Aggregate Anleihen-ETF",30]]},
+   {title:"Wachstum & Puffer", why:"Mehr Aktienchance, durch Mischportfolio etwas gebremst.", items:[["S&P 500 (USA)",35],["MSCI World (Industrieländer)",35],["Mischportfolio 60/40",30]]},
+   {title:"Dividende & Wachstum", why:"Ausschüttungen plus weltweites Wachstum und Gold.", items:[["Vanguard FTSE All-World High Dividend",34],["FTSE All-World / MSCI ACWI",33],["Gold (ETC)",33]]},
+ ]},
+ {level:"<span class='lvldot' style='background:#e59a45'></span> Stufe 4 · Chancenorientiert", desc:"Höhere Renditechance, aber auch deutlich mehr Schwankung.", combos:[
+   {title:"Zukunftsthemen gemischt", why:"KI/Chip-Chancen, breit abgefedert mit Welt-ETF.", items:[["Xtrackers AI & Big Data",34],["MSCI World (Industrieländer)",34],["VanEck Semiconductor (SMH)",32]]},
+   {title:"Global Wachstum", why:"Wachstumsstark und breiter gestreut: US-Tech, Welt und Schwellenländer.", items:[["NASDAQ 100 (US-Tech)",40],["MSCI World (Industrieländer)",30],["MSCI Emerging Markets",30]]},
+   {title:"Breit + Chance", why:"Weltportfolio mit Extra-Schub aus USA und Robotik/KI.", items:[["FTSE All-World / MSCI ACWI",40],["S&P 500 (USA)",30],["Global X Robotics & AI (BOTZ)",30]]},
+ ]},
+];
+let ALLCOMBOS=[];
+function comboMetrics(items){let mean=0,vol=0,div=0,tot=0,parts=[];items.forEach(([n,w])=>{const a=ASSETS.find(x=>x.name===n);if(!a)return;tot+=w;mean+=w*a.mean;vol+=w*a.vol;div+=w*a.div;parts.push({a,w});});if(!tot)return null;mean/=tot;vol/=tot;div/=tot;const vc=parts.length>1?vol*0.85:vol;return{mean,vol:vc,div,rc:riskClass(vc),parts};}
+function renderCombos(){ALLCOMBOS=[];const wrap=$('comboWrap');if(!wrap)return;wrap.innerHTML='';const _rate=+($('empfRate')?$('empfRate').value:200)||200;const _years=+($('empfYears')?$('empfYears').value:20)||20;if($('empfYearsLbl'))$('empfYearsLbl').textContent=_years;
+ TIERS.forEach(t=>{const h=document.createElement('h2');h.className='vh';h.style.fontSize='17px';h.style.marginTop='10px';h.innerHTML=t.level;wrap.appendChild(h);
+  const pd=document.createElement('div');pd.className='vsub';pd.textContent=t.desc;wrap.appendChild(pd);
+  const g=document.createElement('div');g.className='home-grid';wrap.appendChild(g);
+  t.combos.forEach(c=>{const m=comboMetrics(c.items);if(!m)return;const idx=ALLCOMBOS.length;ALLCOMBOS.push(c);const _mo=_years*12,_ev=project(0,_rate,m.mean,_mo),_iv=_rate*_mo,_gn=_ev-_iv;
+   const d=document.createElement('div');d.className='card';d.style.marginBottom='0';
+   d.innerHTML=`<div style="font-weight:700;font-size:16px">${c.title}</div>
+    <div class="selsub" style="margin:4px 0 10px">${c.why||''}</div>
+    ${m.parts.map(p=>`<div class="qf"><span class="k">${p.a.name}</span><span class="v">${p.w} %</span></div>`).join('')}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+      <span class="tag">Ø Rendite <strong style="color:var(--neutral)">${pct(m.mean)}</strong></span>
+      <span class="tag">Dividende <strong class="goldc">${pct(m.div)}</strong></span>
+      <span class="tag">Risiko <span class="rc" style="background:${RC_COLOR[m.rc]}">${m.rc}</span> ${RC_LABEL[m.rc]}</span>
+    </div>
+    <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px"><div class="selsub" style="margin-bottom:4px">Bei ${eur(_rate)}/Monat über ${_years} Jahre:</div><div class="qf"><span class="k">Voraussichtlicher Wert</span><span class="v" style="color:var(--neutral)">≈ ${eur(_ev)}</span></div><div class="qf"><span class="k">Eingezahlt</span><span class="v">${eur(_iv)}</span></div><div class="qf"><span class="k">Gewinn (Zinseszins)</span><span class="v" style="color:var(--up)">${eur(_gn)}</span></div></div><button class="sidebtn" data-combo="${idx}" style="margin-top:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="M8 11l4 4 4-4"/><path d="M5 20h14"/></svg> Ins Portfolio übernehmen</button>`;
+   g.appendChild(d);});
+ });
+ wrap.querySelectorAll('[data-combo]').forEach(b=>b.onclick=()=>loadCombo(+b.dataset.combo));
+}
+function loadCombo(i){const c=ALLCOMBOS[i];if(!c)return;PORT=[];c.items.forEach(([n,w])=>{const a=ASSETS.find(x=>x.name===n);if(a)PORT.push({name:a.name,sym:a.sym,type:a.type,mean:a.mean,vol:a.vol,div:a.div,est:false,amt:Math.max(1,Math.round((+($('empfRate')?$('empfRate').value:200)||200)*w/100))});});if($('empfYears')&&$('pYears')){$('pYears').value=$('empfYears').value;if($('pYearsLbl'))$('pYearsLbl').textContent=$('empfYears').value;}renderPort();updatePortfolio();showView('portfolio');}
+['empfRate','empfYears'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('input',renderCombos);});renderCombos();
+renderPort();updatePortfolio();renderSaved();if(load('datamode')==='expert')applyDataMode('expert');document.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('role')==='button'&&!/^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')){e.preventDefault();t.click();}}});function a11yEnhance(){document.querySelectorAll('label').forEach(function(l){if(!l.htmlFor){var inp=l.parentElement&&l.parentElement.querySelector('input,select');if(inp){if(!inp.id)inp.id='inp_'+Math.random().toString(36).slice(2,8);l.htmlFor=inp.id;}}});document.querySelectorAll('.info').forEach(function(el){el.setAttribute('tabindex','0');el.setAttribute('role','note');var t=el.getAttribute('data-tip');if(t)el.setAttribute('aria-label',t);});}a11yEnhance();function computeZiel(){var target=+$('zTarget').value||0,start=+$('zStart').value||0,years=+$('zYears').value,ann=+$('zRet').value;$('zYearsLbl').textContent=years;$('zGoalY').textContent=years;var months=years*12,rm=ann/100/12;var startFV=start*Math.pow(1+rm,months);var annuity=rm===0?months:(((Math.pow(1+rm,months)-1)/rm)*(1+rm));var rate=(target-startFV)/annuity;if(!isFinite(rate)||rate<0)rate=0;var inv=start+rate*months,endV=project(start,rate,ann,months);$('zRate').textContent=eur(Math.ceil(rate));$('zInv').textContent=eur(inv);$('zInvSub').textContent='über '+years+' Jahre';$('zGain').textContent=eur(Math.max(0,endV-inv));$('zGoal').textContent=eur(target);}['zTarget','zStart','zYears','zRet'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',computeZiel);});computeZiel();function showOnboard(){var o=$('onboard');if(o)o.style.display='flex';}if($('onboardStart'))$('onboardStart').onclick=function(){$('onboard').style.display='none';store('onboarded','1');};if($('openOnboard'))$('openOnboard').onclick=showOnboard;if(load('consentAccepted')==='1'&&!load('onboarded'))showOnboard();var vChart=null;function fillV(){var a=$('vA'),b=$('vB');if(!a)return;var opts=ASSETS.map(function(x,i){return '<option value="'+i+'">'+x.name+'</option>';}).join('');a.innerHTML=opts;b.innerHTML=opts;a.value='0';var bi=ASSETS.findIndex(function(x){return x.type==='Aktie';});b.value=bi>=0?bi:1;}function renderVergleich(){if(!$('vA'))return;var A=ASSETS[+$('vA').value]||ASSETS[0],B=ASSETS[+$('vB').value]||ASSETS[1];var rate=+$('vRate').value||0,years=+$('vYears').value;$('vYearsLbl').textContent=years;var months=years*12,inv=rate*months;function series(x){var arr=[];for(var y=0;y<=years;y++){arr.push(Math.round(project(0,rate,x.mean,y*12)));}return arr;}var sa=series(A),sb=series(B),si=[];for(var y=0;y<=years;y++)si.push(rate*y*12);$('vAName').textContent=A.name;$('vBName').textContent=B.name;$('vLegA').textContent=A.name;$('vLegB').textContent=B.name;var rcA=riskClass(A.vol),rcB=riskClass(B.vol);var rows=[['Ø Rendite p.a.',pct(A.mean),pct(B.mean)],['Dividende',pct(A.div),pct(B.div)],['Schwankung',pct(A.vol),pct(B.vol)],['Risikoklasse',rcA+' · '+RC_LABEL[rcA],rcB+' · '+RC_LABEL[rcB]],['Endwert (≈)',eur(sa[years]),eur(sb[years])],['Gewinn',eur(sa[years]-inv),eur(sb[years]-inv)]];$('vTable').querySelector('tbody').innerHTML=rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>';}).join('');var labels=[];for(var y=0;y<=years;y++)labels.push(y+'');var ds=[{label:A.name,data:sa,borderColor:'#4f9cf0',fill:false,tension:.25,pointRadius:0,borderWidth:2.5},{label:B.name,data:sb,borderColor:'#e0b64f',fill:false,tension:.25,pointRadius:0,borderWidth:2.5},{label:'Eingezahlt',data:si,borderColor:'#7a8aa0',borderDash:[6,4],fill:false,tension:0,pointRadius:0,borderWidth:1.5}];if(vChart){vChart.data.labels=labels;vChart.data.datasets=ds;vChart.update();}else vChart=new Chart($('vChart'),{type:'line',data:{labels:labels,datasets:ds},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>'Jahr '+i[0].label,label:c=>c.dataset.label+': '+eur(c.parsed.y)}}},scales:{x:{grid:{color:'#22303d'},ticks:{color:'#93a4b5'}},y:{grid:{color:'#22303d'},ticks:{color:'#93a4b5',callback:v=>eur(v)}}}}});}['vA','vB','vRate','vYears'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderVergleich);});fillV();renderVergleich();var eChart=null;function computeEntnahme(){if(!$('eStart'))return;var V=+$('eStart').value||0,w0=+$('eWd').value||0,ann=+$('eRet').value,inflOn=$('eInfl').checked;var rm=ann/100/12;var v=V,w=w0,total=0,lastedM=null,MAXM=1200;var labels=['0'],series=[Math.round(V)];for(var m=1;m<=MAXM;m++){v=v*(1+rm);var pay=Math.min(w,v);v-=pay;total+=pay;if(inflOn&&m%12===0)w=w*1.02;if(m%12===0){labels.push((m/12)+'');series.push(Math.round(Math.max(0,v)));}if(v<=0.01){lastedM=m;break;}}var safe=V*0.04/12;if(lastedM===null){$('eYears').textContent='dauerhaft';$('eYearsSub').textContent='Verm&ouml;gen bleibt/w&auml;chst';}else{var yy=Math.floor(lastedM/12),mm=lastedM%12;$('eYears').textContent=yy+' J '+mm+' M';$('eYearsSub').textContent='dann aufgebraucht';}$('eTotal').textContent=eur(total);$('eSafe').textContent=eur(safe);$('eRetShow').textContent=pct(ann);var ds=[{label:'Verm\u00f6gen',data:series,borderColor:'#4f9cf0',backgroundColor:'rgba(79,156,240,.10)',fill:true,tension:.2,pointRadius:0,borderWidth:2.5}];if(eChart){eChart.data.labels=labels;eChart.data.datasets=ds;eChart.update();}else eChart=new Chart($('eChart'),{type:'line',data:{labels:labels,datasets:ds},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>'Jahr '+i[0].label,label:c=>c.dataset.label+': '+eur(c.parsed.y)}}},scales:{x:{title:{display:true,text:'Jahre',color:'#93a4b5'},grid:{color:'#22303d'},ticks:{color:'#93a4b5'}},y:{grid:{color:'#22303d'},ticks:{color:'#93a4b5',callback:v=>eur(v)}}}}});}['eStart','eWd','eRet','eInfl'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',computeEntnahme);});document.querySelectorAll('input[type=number]').forEach(function(inp){inp.addEventListener('change',function(){var v=parseFloat(inp.value);var mn=inp.min!==''?parseFloat(inp.min):0;var mx=inp.max!==''?parseFloat(inp.max):1000000000;if(isNaN(v)){inp.value=mn;}else if(v<mn){inp.value=mn;}else if(v>mx){inp.value=mx;}inp.dispatchEvent(new Event('input',{bubbles:true}));});});computeEntnahme();var GC_CODE='investblicknms';/* <-- Hier deinen GoatCounter-Code eintragen, z.B. 'investblick' */if(GC_CODE){var _gs=document.createElement('script');_gs.async=true;_gs.src='//gc.zgo.at/count.js';_gs.setAttribute('data-goatcounter','https://'+GC_CODE+'.goatcounter.com/count');document.body.appendChild(_gs);}if($('shareResult'))$('shareResult').onclick=function(){var a=ASSETS[SEL];var p=new URLSearchParams();p.set('r',$('rate').value);p.set('s',$('start').value);p.set('y',$('years').value);p.set('sym',a.sym);p.set('i',$('infl').checked?'1':'0');p.set('re',$('reinvest').checked?'1':'0');p.set('t',($('tax')&&$('tax').checked)?'1':'0');if(DATAMODE==='expert')p.set('d','e');var url=location.origin+location.pathname+'?'+p.toString();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){alert('Ergebnis-Link kopiert:\n'+url);},function(){prompt('Link kopieren:',url);});}else{prompt('Link kopieren:',url);}};if($('pdfBtn'))$('pdfBtn').onclick=function(){window.print();};function makeImage(){var a=ASSETS[SEL];var cc=$('chart');var W=1000,H=600,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.fillStyle='#0f1720';x.fillRect(0,0,W,H);x.fillStyle='#3ba776';x.fillRect(40,38,6,26);x.fillStyle='#e8eef4';x.font='bold 30px Arial,sans-serif';x.fillText('InvestBlick',58,60);x.fillStyle='#93a4b5';x.font='18px Arial,sans-serif';x.fillText(a.name,40,96);x.fillStyle='#4f9cf0';x.font='bold 44px Arial,sans-serif';x.fillText($('kValue').textContent,40,158);x.fillStyle='#93a4b5';x.font='16px Arial,sans-serif';x.fillText($('rate').value+' EUR/Monat, '+$('years').value+' Jahre, eingezahlt '+$('kInvest').textContent,40,188);try{x.drawImage(cc,30,210,W-60,340);}catch(e){}x.fillStyle='#6f8093';x.font='13px Arial,sans-serif';x.fillText('Statistische Schaetzung, keine Anlageberatung - investblick-nms.netlify.app',40,H-22);var lk=document.createElement('a');lk.download='investblick-ergebnis.png';lk.href=c.toDataURL('image/png');lk.click();}if($('imgBtn'))$('imgBtn').onclick=makeImage;var AIQA=[{"c": "Grundlagen", "q": "Was ist ein ETF?", "k": ["etf", "indexfonds", "fonds"], "a": "Ein ETF ist ein boersengehandelter Indexfonds: ein Korb aus vielen Aktien oder Anleihen in einem einzigen Papier. Statt einzelne Firmen zu kaufen, kaufst du auf einen Schlag einen ganzen Markt. Das streut das Risiko breit und ist fuer Einsteiger meist der einfachste Einstieg."}, {"c": "Grundlagen", "q": "Was ist eine Aktie?", "k": ["aktie", "anteil", "firma"], "a": "Eine Aktie ist ein kleiner Anteil an einem Unternehmen. Steigt der Firmenwert, steigt meist auch der Aktienkurs; faellt er, faellt der Kurs. Einzelne Aktien schwanken staerker als ein breiter ETF, weil alles von dieser einen Firma abhaengt (Klumpenrisiko)."}, {"c": "Grundlagen", "q": "Was ist ein Sparplan?", "k": ["sparplan", "monatlich", "dauerauftrag"], "a": "Beim Sparplan legst du automatisch jeden Monat einen festen Betrag an, oft schon ab 25 Euro. Ueber viele Jahre entsteht durch den Zinseszins aus kleinen Raten ein grosser Betrag, auch wenn die Maerkte zwischendurch schwanken. Automatisieren nimmt dir Disziplin und Emotionen ab."}, {"c": "Grundlagen", "q": "Was ist der Zinseszins?", "k": ["zinseszins", "zins", "exponentiell"], "a": "Du bekommst nicht nur auf dein eingezahltes Geld Rendite, sondern auch auf die bereits erzielten Gewinne. Ueber Jahrzehnte ist das der staerkste Hebel beim Vermoegensaufbau. Deshalb lohnt es sich so sehr, frueh anzufangen."}, {"c": "Grundlagen", "q": "Was ist eine Dividende?", "k": ["dividende", "ausschuettung", "einkommen"], "a": "Eine Dividende ist ein Teil des Firmengewinns, der regelmaessig an die Anteilseigner ausgezahlt wird, eine Art passives Einkommen. Nicht jede Firma zahlt Dividende: Wachstumsfirmen investieren Gewinne oft lieber zurueck."}, {"c": "Grundlagen", "q": "Was bedeutet Rendite?", "k": ["rendite", "gewinn", "zuwachs"], "a": "Rendite ist der prozentuale Wertzuwachs pro Jahr. Im Rechner ist die angezeigte Rendite ein langfristiger Durchschnitt: Einzelne Jahre koennen deutlich darueber oder darunter (auch negativ) liegen. Sie ist eine Schaetzung, keine Garantie."}, {"c": "Grundlagen", "q": "Was ist Volatilitaet bzw. Schwankung?", "k": ["volatilitaet", "schwankung", "schwankt"], "a": "Volatilitaet beschreibt, wie stark ein Kurs typischerweise schwankt. Je hoeher, desto groesser die Ausschlaege nach oben und unten. Hohe Schwankung heisst mehr Chance, aber auch mehr Risiko."}, {"c": "Grundlagen", "q": "Was bedeutet die Risikoklasse 1 bis 7?", "k": ["risikoklasse", "risiko", "klasse"], "a": "Das ist ein EU-Standard: 1 = sehr sicher (kaum Schwankung), 7 = sehr spekulativ (starke Ausschlaege). Breite ETFs liegen meist niedriger, Einzelaktien hoeher. Je laenger dein Anlagehorizont, desto besser gleichen sich Schwankungen aus."}, {"c": "Grundlagen", "q": "Was ist Diversifikation bzw. Streuung?", "k": ["diversifikation", "streuung", "verteilen"], "a": "Streuung heisst, dein Geld auf viele verschiedene Firmen, Branchen und Laender zu verteilen. Faellt eine, fangen die anderen es ab. Ein breiter ETF macht das automatisch, deshalb gilt er als solide Basis."}, {"c": "Grundlagen", "q": "Thesaurierend oder ausschuettend?", "k": ["thesaurierend", "ausschuettend", "reinvest"], "a": "Ausschuettende ETFs zahlen dir die Dividende aufs Konto. Thesaurierende legen sie automatisch wieder an (staerkerer Zinseszins). Fuer langfristigen Aufbau sind thesaurierende oft praktisch; wer laufendes Einkommen will, waehlt ausschuettende."}, {"c": "Grundlagen", "q": "Was ist der MSCI World?", "k": ["msci", "world", "weltindex"], "a": "Der MSCI World ist ein Aktienindex mit rund 1500 grossen Firmen aus Industrielaendern weltweit. Ein ETF darauf ist einer der beliebtesten Bausteine fuer Einsteiger, weil er extrem breit streut. Langfristig lag die Rendite historisch bei etwa 7 bis 8 Prozent pro Jahr."}, {"c": "ETFs", "q": "Welche ETFs eignen sich fuer Einsteiger?", "k": ["einsteiger", "anfaenger", "welcher etf", "empfehlung etf"], "a": "Als breite Basis gelten ein MSCI World oder ein FTSE All-World, weil sie weltweit streuen. Das ist keine Empfehlung, sondern eine haeufige Einsteiger-Wahl. Im Tab ETFs kannst du sie auswaehlen und durchrechnen."}, {"c": "ETFs", "q": "Was ist die TER bei ETFs?", "k": ["ter", "kosten", "gebuehr"], "a": "Die TER (Total Expense Ratio) sind die laufenden jaehrlichen Kosten eines ETFs, oft 0,1 bis 0,5 Prozent. Sie mindern deine Rendite direkt, deshalb sind guenstige ETFs meist besser. Im Rechner werden sie beim Schalter Nach Steuern und Kosten beruecksichtigt."}, {"c": "ETFs", "q": "Was ist ein Themen-ETF (z. B. AI und Big Data)?", "k": ["thema", "ki", "ai", "big data", "robotik", "nvidia etf"], "a": "Ein Themen-ETF investiert gezielt in einen Trend, etwa Kuenstliche Intelligenz, Robotik oder Halbleiter. Mehr Chance, aber auch mehr Schwankung und Klumpenrisiko, weil er weniger breit streut. In der ETF-Liste findest du sie unter Alle."}, {"c": "ETFs", "q": "Was ist ein Dividenden-ETF?", "k": ["dividenden-etf", "hohe dividende", "ausschuettung etf"], "a": "Ein Dividenden-ETF buendelt Firmen mit hohen bzw. verlaesslichen Dividenden. Fokus liegt auf regelmaessigen Ausschuettungen statt maximalem Kurswachstum. Ueber den Filter Dividende ab 3 Prozent findest du die staerksten Zahler."}, {"c": "Aktien", "q": "Sind Einzelaktien riskant?", "k": ["einzelaktie", "aktie riskant", "risiko aktie"], "a": "Ja, deutlich riskanter als breite ETFs. Weil alles von einer Firma abhaengt, kann der Kurs stark schwanken, im schlimmsten Fall bis zum Totalverlust. Einzelaktien eignen sich eher als Beimischung, nicht als einziges Investment."}, {"c": "Aktien", "q": "Was sind Dividendenaktien?", "k": ["dividendenaktie", "hohe dividende aktie"], "a": "Das sind Aktien von meist etablierten Firmen, die regelmaessig einen Teil des Gewinns ausschuetten (z. B. Coca-Cola, Allianz, Realty Income). Sie schwanken oft etwas weniger als reine Wachstumswerte, dafuer ist das Kurswachstum meist geringer."}, {"c": "Aktien", "q": "Was sind Wachstumsaktien?", "k": ["wachstumsaktie", "growth", "tech aktie"], "a": "Wachstumsaktien sind Firmen, die stark wachsen wollen (oft Tech wie Nvidia, Amazon). Chance auf hohe Rendite, aber starke Schwankungen und meist kaum Dividende. Im Rechner erkennst du sie an hoher Rendite-Annahme und hoher Risikoklasse."}, {"c": "Risiko", "q": "Wie riskant ist Investieren?", "k": ["riskant", "verlust", "sicher"], "a": "Kurse schwanken, kurzfristig sind Verluste normal, und ein Totalverlust ist bei Einzelwerten moeglich. Breite Streuung und ein langer Anlagehorizont senken das Risiko deutlich. Leg nur Geld an, das du einige Jahre nicht brauchst, und halte vorher einen Notgroschen bereit."}, {"c": "Risiko", "q": "Was ist das Klumpenrisiko?", "k": ["klumpenrisiko", "klumpen", "konzentration"], "a": "Klumpenrisiko heisst, dass zu viel von deinem Geld an einem einzelnen Wert, einer Branche oder einem Land haengt. Faellt genau der, trifft es dich hart. Streuung ueber viele Werte (z. B. per ETF) vermeidet das."}, {"c": "Risiko", "q": "Was tun bei einem Crash?", "k": ["crash", "kurssturz", "fallen", "panik"], "a": "Ruhe bewahren. Kursstuerze gehoeren zum Investieren dazu und haben sich historisch immer wieder erholt. Wer dann panisch verkauft, macht Verluste real. Wer investiert bleibt oder sogar guenstig weiter spart, faehrt langfristig meist besser. Das ist keine Beratung, sondern eine allgemeine Einordnung."}, {"c": "Steuern", "q": "Muss ich Steuern zahlen?", "k": ["steuern", "steuer", "abgeltung"], "a": "In Deutschland faellt auf Gewinne und Dividenden die Abgeltungssteuer von rund 26,4 Prozent an, abzueglich des Sparerpauschbetrags von 1000 Euro pro Jahr. Im Rechner kannst du den Schalter Nach Steuern und Kosten aktivieren. Das ist eine vereinfachte Schaetzung, keine Steuerberatung."}, {"c": "Steuern", "q": "Was ist der Sparerpauschbetrag?", "k": ["sparerpauschbetrag", "freibetrag", "1000 euro"], "a": "Das ist ein jaehrlicher Steuerfreibetrag von 1000 Euro pro Person auf Kapitalertraege (Gewinne und Dividenden). Bis dahin zahlst du keine Abgeltungssteuer. Bei der Bank stellst du dafuer einen Freistellungsauftrag."}, {"c": "Strategie", "q": "Was ist die 4-Prozent-Regel?", "k": ["4 prozent", "entnahme", "ruhestand", "fire"], "a": "Eine Faustregel fuer den Ruhestand: Wer pro Jahr etwa 4 Prozent seines Vermoegens entnimmt, dessen Geld reicht statistisch sehr lange. Bei 300.000 Euro waeren das rund 1000 Euro im Monat. Im Tab Entnahmeplan kannst du das mit deinen Zahlen durchrechnen."}, {"c": "Strategie", "q": "Was ist die Mix- bzw. Hantel-Strategie?", "k": ["hantel", "mix", "riskant und sicher"], "a": "Dabei kombinierst du bewusst Riskantes mit Sicherem: z. B. eine chancenreiche Aktie plus einen sicheren Anker wie Anleihen. Der riskante Teil bringt Rendite, der sichere daempft die Schwankung. Im Tab Beispiele gibt es dafuer eine eigene Kategorie."}, {"c": "Strategie", "q": "Historisch oder Experten-Prognose?", "k": ["historisch", "experten", "prognose", "cma"], "a": "Oben kannst du die Rechengrundlage umschalten. Historisch nutzt den langjaehrigen Durchschnitt. Experten-Prognose nutzt aktuelle Renditeerwartungen grosser Haeuser (J.P. Morgan, Vanguard u. a.), die meist vorsichtiger sind. Beides sind Schaetzungen, keine Vorhersagen."}, {"c": "Seite", "q": "Wie funktioniert der Sparplan-Rechner?", "k": ["rechner", "wie funktioniert", "bedienung", "benutzen"], "a": "1) Waehle im Tab ETFs oder Aktien einen Wert aus. 2) Gib im Feld Dein Sparplan deine monatliche Rate und die Laufzeit ein. 3) Sofort siehst du Endwert, Gewinn, Dividende, Risiko und Wahrscheinlichkeiten. Die Rendite berechnet das System selbst."}, {"c": "Seite", "q": "Wie nutze ich das Portfolio?", "k": ["portfolio", "mehrere werte", "kombinieren"], "a": "Im Tab Mein Portfolio suchst du mehrere Werte, gibst jedem einen Monatsbetrag und fuegst sie hinzu (z. B. 100 Euro Apple plus 100 Euro Nvidia). Alles wird zusammengerechnet: Endwert, Risiko und Dividende des Gesamtdepots. Portfolios kannst du speichern."}, {"c": "Seite", "q": "Was macht der Ziel-Rechner?", "k": ["ziel", "rueckwaerts", "zielbetrag"], "a": "Der Ziel-Rechner rechnet andersherum: Du sagst deinen Wunschbetrag und die Laufzeit, und er sagt dir die noetige monatliche Sparrate. Praktisch, wenn du ein konkretes Sparziel hast."}, {"c": "Seite", "q": "Was macht der Entnahmeplan?", "k": ["entnahme", "entnahmeplan", "ruhestand rechner"], "a": "Der Entnahmeplan zeigt, wie lange dein Vermoegen reicht, wenn du monatlich einen festen Betrag entnimmst. Er nennt dir auch die nachhaltige Rate nach der 4-Prozent-Regel und zeigt den Vermoegensverlauf als Grafik."}, {"c": "Seite", "q": "Was ist der Vergleich?", "k": ["vergleich", "nebeneinander", "gegenueber"], "a": "Im Tab Vergleich stellst du zwei Werte direkt nebeneinander, bei gleicher Sparrate und Laufzeit. Du siehst Rendite, Dividende, Risiko und Endwert beider und beide Verlaeufe in einem Chart."}, {"c": "Seite", "q": "Was sind die Beispiele?", "k": ["beispiele", "fertige", "kombinationen", "stufen"], "a": "Der Tab Beispiele zeigt fertige Misch-Portfolios in vier Sicherheitsstufen, von sehr sicher bis chancenorientiert, plus eine Mix-Kategorie. Gib deinen Sparbetrag ein und ein Klick uebernimmt die Mischung ins Portfolio. Alles nur Beispiele, keine Empfehlung."}, {"c": "Seite", "q": "Wie speichere ich Favoriten?", "k": ["favorit", "stern", "merken", "merkliste"], "a": "In der Werteliste klickst du auf den Stern links neben dem Namen, dann ist der Wert gemerkt (lokal gespeichert). Ueber den Filter-Chip Favoriten siehst du nur deine gemerkten Werte."}, {"c": "Seite", "q": "Was bedeutet Nach Steuern und Kosten?", "k": ["nach steuern", "schalter steuern", "netto"], "a": "Der Schalter zieht die laufenden ETF-Kosten (TER) von der Rendite ab und rechnet die deutsche Abgeltungssteuer auf den Gewinn (abzueglich 1000 Euro Freibetrag). So siehst du eine realistischere Netto-Zahl. Es ist ein vereinfachtes Modell, keine Steuerberatung."}, {"c": "Seite", "q": "Wie teile ich mein Ergebnis?", "k": ["teilen", "link", "bild", "exportieren", "pdf"], "a": "Im Rechner gibt es Ergebnis-Link kopieren (Link mit deinen Eingaben), Als Bild speichern (fuer Social Media) und Als PDF speichern. Der Link oeffnet beim Empfaenger genau dein Ergebnis."}, {"c": "Seite", "q": "Was ist die Monte-Carlo-Simulation?", "k": ["monte", "carlo", "simulation", "zufall"], "a": "Statt nur einer Zahl rechnet sie 500 zufaellige Verlaeufe auf Basis von Rendite und Schwankung. So siehst du eine Bandbreite: einen schwachen, einen mittleren und einen starken Ausgang, und in wie viel Prozent der Faelle du ueber deiner Einzahlung landest."}, {"c": "Seite", "q": "Sind die Live-Kurse echt?", "k": ["live", "kurse echt", "tradingview", "aktuell"], "a": "Ja, die Live-Charts kommen von TradingView und zeigen aktuelle Kurse (koennen leicht verzoegert sein). Die Rechen-Kennzahlen (Rendite, Schwankung) sind dagegen langfristige Durchschnittswerte, keine tagesaktuellen Zahlen."}, {"c": "Seite", "q": "Ist das hier eine Anlageberatung?", "k": ["anlageberatung", "beratung", "empfehlung", "seriös"], "a": "Nein. InvestBlick ist ein reines Info- und Bildungs-Tool mit statistischen Schaetzungen. Es gibt keine Empfehlungen und keine Garantie. Anlageentscheidungen triffst du eigenverantwortlich, im Zweifel mit unabhaengiger Beratung."}, {"c": "Seite", "q": "Wie finde ich einen bestimmten Wert?", "k": ["suchen", "finden", "suche", "ticker"], "a": "Im Tab Aktien-Suche tippst du einen Namen oder ein Kuerzel (z. B. Apple, SAP, NVDA). Es erscheinen Vorschlaege mit Live-Chart und Kennzahlen. Praktisch jede Aktie und jeder ETF weltweit ist so auffindbar."}];(function(){var cats=[];AIQA.forEach(function(x){if(cats.indexOf(x.c)<0)cats.push(x.c);});function add(t,who){var m=document.getElementById('aiMsgs');if(!m)return;var d=document.createElement('div');d.className='aibubble '+who;d.textContent=t;m.appendChild(d);m.scrollTop=m.scrollHeight;}function chips(items){var c=document.getElementById('aiChips');c.innerHTML='';items.forEach(function(it){var b=document.createElement('button');b.className='aichip';b.textContent=it.label;b.onclick=it.onclick;c.appendChild(b);});}function showCats(){chips(cats.map(function(cat){return {label:cat,onclick:function(){showCat(cat);}};}));}function showCat(cat){var qs=AIQA.filter(function(x){return x.c===cat;});var items=qs.map(function(x){return {label:x.q,onclick:function(){answer(x);}};});items.unshift({label:'\u2039 Themen',onclick:showCats});chips(items);}function answer(x){add(x.q,'user');setTimeout(function(){add(x.a,'bot');},160);}function search(t){var s=t.toLowerCase(),best=null,bs=0;AIQA.forEach(function(x){var sc=0;x.k.forEach(function(k){if(s.indexOf(k)>=0)sc+=2;});x.q.toLowerCase().split(' ').forEach(function(w){if(w.length>3&&s.indexOf(w)>=0)sc+=1;});if(sc>bs){bs=sc;best=x;}});add(t,'user');setTimeout(function(){if(best&&bs>0){add(best.a,'bot');}else{add('Das habe ich nicht sicher verstanden. Waehl unten ein Thema, oder frag z. B. Was ist ein ETF, Wie funktioniert der Rechner oder Muss ich Steuern zahlen.','bot');showCats();}},160);}var b=document.getElementById('aiBtn');if(b)b.onclick=function(){var p=document.getElementById('aiPanel');p.classList.toggle('open');};var cl=document.getElementById('aiClose');if(cl)cl.onclick=function(){document.getElementById('aiPanel').classList.remove('open');};var sd=document.getElementById('aiSend');if(sd)sd.onclick=function(){var i=document.getElementById('aiInput');if(i.value.trim()){search(i.value.trim());i.value='';}};var inp=document.getElementById('aiInput');if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){document.getElementById('aiSend').click();}});add('Hi! Ich bin dein InvestBlick-Assistent. Ich erklaere dir Aktien, ETFs, Dividenden, Risiko, Steuern und wie diese Seite funktioniert. Waehl unten ein Thema oder tippe eine Frage.','bot');showCats();})();(function(){try{var p=new URLSearchParams(location.search);var ks=[];p.forEach(function(v,k){ks.push(k);});if(!ks.length)return;if(p.get('r')!==null)$('rate').value=p.get('r');if(p.get('s')!==null)$('start').value=p.get('s');if(p.get('y')!==null)$('years').value=p.get('y');if(p.get('i')!==null)$('infl').checked=p.get('i')==='1';if(p.get('re')!==null)$('reinvest').checked=p.get('re')==='1';if(p.get('t')==='1'&&$('tax'))$('tax').checked=true;if(p.get('d')==='e'){applyDataMode('expert');}var sym=p.get('sym');if(sym){var i=ASSETS.findIndex(function(x){return x.sym===sym;});if(i>=0){SEL=i;var base=ASSETS[i].type;var tab=document.querySelector('.tab[data-base="'+base+'"]');showView('rechner',base,tab);}}update();}catch(e){}})();
+renderList();update();
+</script>
+</body>
+</html>

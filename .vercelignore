@@ -1,0 +1,5 @@
+# Diese Dateien werden NICHT auf der öffentlichen Website veröffentlicht:
+*.mp4
+investblick-projekt-zusammenfassung.md
+heygen-hintergrund.png
+.claude/
