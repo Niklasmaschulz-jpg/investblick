@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>InvestBlick – Zinseszins-Video EXPORT</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#0a0f15;color:#f2f6fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px}
+  canvas{height:78vh;max-height:78vh;aspect-ratio:9/16;background:#0a0f15;border-radius:18px;box-shadow:0 16px 50px rgba(0,0,0,.5)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  button{font-size:16px;font-weight:800;border:0;border-radius:999px;padding:13px 24px;cursor:pointer}
+  #make{background:#35c08a;color:#07120c}
+  #prev{background:transparent;color:#9db0c2;border:1px solid #2a3744}
+  #status{font-size:14px;color:#9db0c2;min-height:20px;text-align:center;max-width:34em;line-height:1.5}
+  b{color:#dfe9f2}
+</style>
+</head>
+<body>
+  <canvas id="cv" width="1080" height="1920"></canvas>
+  <div class="row">
+    <button id="make">🎬 Video erstellen &amp; herunterladen</button>
+    <button id="prev">▶ Nur Vorschau</button>
+  </div>
+  <div id="status">Klick auf <b>„Video erstellen"</b> → das Video läuft einmal durch (~32&nbsp;Sek.) und lädt sich am Ende automatisch als Datei herunter. Nicht wegklicken, bis „Fertig" erscheint.</div>
+<script>
+(function(){
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var W=1080,H=1920,CX=540;
+  var status=document.getElementById('status');
+  var END=244000,PAID=72000,GAIN=172000;
+  function eur(n){return Math.round(n).toLocaleString('de-DE')+' €';}
+  function ease(t){return 1-Math.pow(1-t,3);}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+  // scene boundaries (ms)
+  var S=[0,5000,9300,13500,18000,21800,28000,31500];
+  var TOTAL=31500;
+
+  function bg(){
+    ctx.fillStyle='#0a0f15';ctx.fillRect(0,0,W,H);
+    var g1=ctx.createRadialGradient(CX,300,60,CX,300,900);g1.addColorStop(0,'rgba(53,192,138,.20)');g1.addColorStop(1,'rgba(53,192,138,0)');ctx.fillStyle=g1;ctx.fillRect(0,0,W,H);
+    var g2=ctx.createRadialGradient(CX,1750,60,CX,1750,900);g2.addColorStop(0,'rgba(79,156,240,.16)');g2.addColorStop(1,'rgba(79,156,240,0)');ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);
+  }
+  function prog(t){
+    var x=40,top=44,gap=8,n=S.length-1,w=(W-80-gap*(n-1))/n;
+    for(var i=0;i<n;i++){
+      ctx.fillStyle='rgba(255,255,255,.18)';round(x,top,w,6,3);
+      var f=clamp((t-S[i])/(S[i+1]-S[i]),0,1);
+      ctx.fillStyle='#fff';round(x,top,w*f,6,3);
+      x+=w+gap;
+    }
+  }
+  function round(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.fill();}
+  function text(t,y,size,weight,color,align){ctx.fillStyle=color;ctx.textAlign=align||'center';ctx.textBaseline='middle';ctx.font=weight+' '+size+'px -apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif';ctx.fillText(t,align==='left'?80:(align==='right'?W-80:CX),y);}
+  function pill(t,y,bgc,fg){ctx.font='800 34px -apple-system,Helvetica,Arial,sans-serif';var w=ctx.measureText(t).width+56;ctx.fillStyle=bgc;round(CX-w/2,y-30,w,60,30);text(t,y,34,'800',fg);}
+  function footer(){text('Statistische Schätzung. Keine Anlageberatung.',H-34,24,'600','#5f7183');}
+  function alphaWrap(a,fn){ctx.save();ctx.globalAlpha=clamp(a,0,1);fn();ctx.restore();}
+
+  function draw(t){
+    bg();
+    // scene index
+    var i=0;for(var k=0;k<S.length-1;k++){if(t>=S[k]&&t<S[k+1]){i=k;break;}if(t>=S[S.length-1])i=S.length-2;}
+    var lt=t-S[i];
+    var appear=ease(clamp(lt/450,0,1));
+    if(i===0){ // HOOK
+      var sh=Math.sin(t/70)*3;
+      ctx.save();ctx.translate(sh,0);pill('STOP ✋ NICHT WEGSWIPEN',560,'#e5484d','#fff');ctx.restore();
+      alphaWrap(appear,function(){text('200 €',740,180,'900','#35c08a');});
+      alphaWrap(ease(clamp((lt-200)/450,0,1)),function(){text('im Monat. 30 Jahre lang.',900,76,'900','#f2f6fa');});
+      alphaWrap(ease(clamp((lt-450)/450,0,1)),function(){text('Das wird doch nie viel…',1010,58,'600','#b8c7d6');text('oder?',1085,58,'900','#fff');});
+    } else if(i===1){ // GUESSES
+      alphaWrap(appear,function(){text('Die meisten tippen:',730,66,'700','#9db0c2');});
+      alphaWrap(ease(clamp((lt-150)/400,0,1)),function(){text('80.000 €?',880,110,'900','#ffcf4a');});
+      alphaWrap(ease(clamp((lt-350)/400,0,1)),function(){text('100.000 €?',1010,110,'900','#ffcf4a');});
+      alphaWrap(ease(clamp((lt-750)/400,0,1)),function(){text('❌ Komplett daneben.',1170,64,'800','#e5484d');});
+    } else if(i===2){ // CLIFFHANGER + COUNTDOWN
+      alphaWrap(appear,function(){text('Der Zinseszins macht',760,66,'900','#f2f6fa');text('etwas Verrücktes…',850,66,'900','#35c08a');});
+      var seg=Math.floor(lt/1400);var vals=['3','2','1'];var v=vals[clamp(seg,0,2)];
+      var pl=(lt-seg*1400)/1400;var sc=1+0.25*(1-ease(clamp(pl*2,0,1)));
+      ctx.save();ctx.translate(CX,1120);ctx.scale(sc,sc);text(v,0,260,'900','#fff');ctx.restore();
+    } else if(i===3){ // COUNTER + BARS
+      alphaWrap(appear,function(){text('DEIN DEPOT NACH 30 JAHREN',600,44,'700','#9db0c2');});
+      var e=ease(clamp(lt/3300,0,1));
+      text(eur(END*e),760,150,'900','#35c08a');
+      var N=14,cw=W-260,x0=130,gap=10,bw=(cw-gap*(N-1))/N,baseY=1400,maxH=460;
+      for(var b=0;b<N;b++){var tar=Math.pow((b+1)/N,1.9);var hh=maxH*tar*e;
+        var grd=ctx.createLinearGradient(0,baseY-hh,0,baseY);grd.addColorStop(0,'#5aa8ff');grd.addColorStop(1,'#35c08a');ctx.fillStyle=grd;round(x0+b*(bw+gap),baseY-hh,bw,hh,6);}
+    } else if(i===4){ // REVEAL
+      alphaWrap(appear,function(){text('aus nur 200 € im Monat…',760,64,'700','#9db0c2');});
+      var pl=ease(clamp(lt/380,0,1));var sc=0.7+0.3*pl;
+      ctx.save();ctx.globalAlpha=pl;ctx.translate(CX,980);ctx.scale(sc,sc);text(eur(END),0,200,'900','#35c08a');ctx.restore();
+      alphaWrap(ease(clamp((lt-250)/400,0,1)),function(){text('🤯',1200,150,'900','#fff');});
+    } else if(i===5){ // BREAKDOWN
+      alphaWrap(appear,function(){text('Und der Clou:',560,70,'900','#f2f6fa');});
+      var e=ease(clamp((lt-150)/1100,0,1));
+      // bar 1 blue
+      text('Selbst eingezahlt',740,50,'700','#f2f6fa','left');text(eur(PAID),740,50,'700','#9db0c2','right');
+      ctx.fillStyle='rgba(255,255,255,.08)';round(80,790,W-160,64,14);
+      ctx.fillStyle='#5aa8ff';round(80,790,(W-160)*(PAID/END)*e,64,14);
+      // bar 2 green
+      text('Gewinn (Zinseszins)',960,50,'700','#35c08a','left');text('+'+eur(GAIN),960,50,'700','#35c08a','right');
+      ctx.fillStyle='rgba(255,255,255,.08)';round(80,1010,W-160,64,14);
+      ctx.fillStyle='#35c08a';round(80,1010,(W-160)*e,64,14);
+      alphaWrap(ease(clamp((lt-1200)/450,0,1)),function(){text('Das meiste hat',1200,58,'600','#b8c7d6');text('für dich gearbeitet.',1275,58,'900','#35c08a');});
+    } else { // CTA
+      alphaWrap(appear,function(){pill('Kostenlos · werbefrei',620,'rgba(255,255,255,.1)','#cfe0ee');});
+      alphaWrap(ease(clamp((lt-100)/400,0,1)),function(){text('Rechne DEINEN',800,90,'900','#f2f6fa');text('Betrag durch.',900,90,'900','#35c08a');});
+      alphaWrap(ease(clamp((lt-350)/400,0,1)),function(){
+        ctx.fillStyle='#35c08a';round(CX-160,1060,20,80,4);text('InvestBlick',1100,84,'900','#f2f6fa','center');
+      });
+      var bl=0.6+0.4*Math.abs(Math.sin(t/350));
+      alphaWrap(bl,function(){text('Jetzt ausprobieren',1560,44,'700','#dfe9f2');text('↑',1630,60,'900','#dfe9f2');});
+    }
+    prog(t);
+    footer();
+  }
+
+  var rafId=null,startTs=null,recorder=null,chunks=[],audioEl=null,ac=null;
+  function loop(now){
+    if(startTs===null)startTs=now;
+    var t=now-startTs;
+    draw(Math.min(t,TOTAL));
+    if(t<TOTAL+250){rafId=requestAnimationFrame(loop);}
+    else{finish();}
+  }
+  function startPreview(){cancel();startTs=null;rafId=requestAnimationFrame(loop);status.textContent='Vorschau läuft…';}
+  function cancel(){if(rafId)cancelAnimationFrame(rafId);rafId=null;}
+
+  function pickMime(){
+    var opts=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+    for(var i=0;i<opts.length;i++){if(window.MediaRecorder&&MediaRecorder.isTypeSupported(opts[i]))return opts[i];}
+    return '';
+  }
+
+  async function startRecord(){
+    cancel();
+    var mime=pickMime();
+    if(!mime){status.textContent='Dein Browser kann kein Video aufnehmen. Bitte in Google Chrome öffnen.';return;}
+    var vstream=cv.captureStream(30);
+    var tracks=vstream.getVideoTracks();
+    // audio
+    try{
+      audioEl=new Audio('voice-zinseszins.mp3');audioEl.crossOrigin='anonymous';
+      ac=new (window.AudioContext||window.webkitAudioContext)();
+      if(ac.state==='suspended')await ac.resume();
+      var src=ac.createMediaElementSource(audioEl);
+      var dest=ac.createMediaStreamDestination();
+      src.connect(dest);src.connect(ac.destination);
+      dest.stream.getAudioTracks().forEach(function(tr){tracks.push(tr);});
+    }catch(e){/* ohne Ton weiter */}
+    var stream=new MediaStream(tracks);
+    chunks=[];
+    recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000});
+    recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
+    recorder.onstop=function(){
+      var blob=new Blob(chunks,{type:mime.indexOf('mp4')>=0?'video/mp4':'video/webm'});
+      var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download='investblick-zinseszins.'+ext;document.body.appendChild(a);a.click();a.remove();
+      var mb=(blob.size/1048576).toFixed(1);
+      status.innerHTML='✅ <b>Fertig!</b> Datei <b>investblick-zinseszins.'+ext+'</b> ('+mb+' MB) wurde heruntergeladen.'+(ext==='webm'?' <br>Hinweis: Dein Chrome hat WEBM erzeugt – für TikTok ggf. in CapCut kurz als MP4 exportieren.':' Direkt bei TikTok hochladbar.');
+    };
+    startTs=null;
+    recorder.start(200);
+    if(audioEl){try{audioEl.currentTime=0;await audioEl.play();}catch(e){}}
+    rafId=requestAnimationFrame(loop);
+    status.innerHTML='🔴 <b>Aufnahme läuft…</b> bitte warten (~32 Sek.), nichts anklicken.';
+  }
+  function finish(){
+    cancel();
+    if(recorder&&recorder.state!=='inactive'){setTimeout(function(){try{recorder.stop();}catch(e){}},150);}
+    else{status.textContent='Vorschau beendet. Für die Datei auf „Video erstellen" klicken.';}
+  }
+  document.getElementById('make').onclick=startRecord;
+  document.getElementById('prev').onclick=startPreview;
+  draw(0);
+})();
+</script>
+</body>
+</html>
