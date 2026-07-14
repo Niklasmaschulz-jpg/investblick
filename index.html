@@ -43,6 +43,21 @@
   /* Startseite */
   .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
   @media(max-width:680px){.home-grid{grid-template-columns:1fr}}
+  /* Hero */
+  .hero{position:relative;text-align:center;padding:38px 16px 14px;overflow:hidden}
+  .hero>*{position:relative;z-index:1}
+  .hero-glow{position:absolute;top:-130px;left:50%;transform:translateX(-50%);width:560px;height:340px;max-width:120%;background:radial-gradient(ellipse at center,rgba(59,167,118,.20),transparent 70%);pointer-events:none;z-index:0}
+  .hero-badges{display:inline-flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px}
+  .hero-badge{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--accent);background:rgba(59,167,118,.12);border:1px solid rgba(59,167,118,.32);padding:5px 12px;border-radius:999px}
+  .hero-title{font-size:42px;font-weight:800;line-height:1.1;margin:2px 0 14px;letter-spacing:-.6px}
+  .hero-accent{color:var(--accent)}
+  .hero-sub{color:var(--muted);font-size:16.5px;max-width:600px;margin:0 auto 24px;line-height:1.5}
+  .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btnprimary{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:13px 26px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;box-shadow:0 6px 18px rgba(59,167,118,.28)}
+  .btnprimary:hover{filter:brightness(1.07);transform:translateY(-1px)}
+  .btnghost{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:13px 22px;font-size:15px;font-weight:600;cursor:pointer;transition:.15s}
+  .btnghost:hover{border-color:var(--accent);color:var(--accent)}
+  @media(max-width:680px){.hero{padding:24px 12px 8px}.hero-title{font-size:29px}.hero-sub{font-size:15px}}
   .hcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;cursor:pointer;transition:.15s}
   .hcard:hover{border-color:var(--accent);transform:translateY(-2px)}
   .hcard .hicon{font-size:30px;margin-bottom:8px}
@@ -365,10 +380,19 @@
 
   <!-- ============ VIEW: START ============ -->
   <section class="view active" id="view-start">
-    <div style="text-align:center;padding:18px 0 6px">
-      <div style="font-size:44px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16l5-5 4 3 8-8"/><path d="M15 6h5v5"/></svg></div>
-      <h2 style="font-size:30px;font-weight:800;margin:6px 0">Willkommen bei InvestBlick</h2>
-      <p style="color:var(--muted);font-size:16px;max-width:640px;margin:0 auto">Verständlich für Einsteiger: Sparpläne durchrechnen, Dividenden verstehen und Aktien &amp; ETFs mit Live-Kursen ansehen – alles an einem Ort.</p><p style="margin-top:14px"><button class="dbtn" id="openOnboard" style="padding:9px 18px;font-size:14px">Erste Schritte ansehen</button></p>
+    <div class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-badges">
+        <span class="hero-badge">✓ 100 % kostenlos</span>
+        <span class="hero-badge">✓ Ohne Anmeldung</span>
+        <span class="hero-badge">✓ Für Einsteiger erklärt</span>
+      </div>
+      <h2 class="hero-title">Investieren endlich<br><span class="hero-accent">verständlich gemacht</span></h2>
+      <p class="hero-sub">Sparpläne durchrechnen, Dividenden verstehen und Aktien &amp; ETFs mit Live-Kursen ansehen – alles an einem Ort.</p>
+      <div class="hero-cta">
+        <button class="btnprimary herocta" data-go="rechner" type="button">Sparplan berechnen →</button>
+        <button class="btnghost" id="openOnboard" type="button">Erste Schritte ansehen</button>
+      </div>
     </div>
     <div class="home-grid">
       <div role="button" tabindex="0" class="hcard" data-go="rechner" data-base="ETF">
@@ -1272,7 +1296,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 attachAutocomplete($('bigSearch'),$('bigAc'),renderSearchResult);
 
 /* ---- Startseite: Karten führen zu den Bereichen ---- */
-document.querySelectorAll('.hcard').forEach(c=>c.onclick=()=>showView(c.dataset.go,c.dataset.filter));
+document.querySelectorAll('.hcard,.herocta').forEach(c=>c.onclick=()=>showView(c.dataset.go,c.dataset.filter));
 
 /* ---- Speicher-Helfer (localStorage mit Fallback) ---- */
 function store(k,v){try{localStorage.setItem(k,v);}catch(e){}}
