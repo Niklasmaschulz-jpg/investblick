@@ -1,0 +1,43 @@
+name: Deploy to all-inkl
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: allinkl-deploy
+  cancel-in-progress: true
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTPS to all-inkl
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: w021d0ee.kasserver.com
+          username: w021d0ee
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          server-dir: /investblick-nms.com/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/.claude/**
+            **/.DS_Store
+            **/*.mp4
+            **/*.mp3
+            **/*.md
+            video-5euro-export.html
+            video-zinseszins-export.html
+            video-zinseszins.html
+            .gitignore
+            .vercelignore
+            social/**
+            **/.well-known/**
