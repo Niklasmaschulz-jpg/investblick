@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>InvestBlick – 5-€-Video EXPORT (9:16)</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#0a0f15;color:#f2f6fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px}
+  canvas{height:78vh;max-height:78vh;aspect-ratio:9/16;background:#0a0f15;border-radius:18px;box-shadow:0 16px 50px rgba(0,0,0,.5)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  button{font-size:16px;font-weight:800;border:0;border-radius:999px;padding:13px 24px;cursor:pointer}
+  #make{background:#35c08a;color:#07120c}
+  #prev{background:transparent;color:#9db0c2;border:1px solid #2a3744}
+  #status{font-size:14px;color:#9db0c2;min-height:20px;text-align:center;max-width:34em;line-height:1.5}
+  b{color:#dfe9f2}
+</style>
+</head>
+<body>
+  <canvas id="cv" width="1080" height="1920"></canvas>
+  <video id="coins" src="coins-hook.mp4" muted playsinline preload="auto" style="display:none"></video>
+  <div class="row">
+    <button id="make">🎬 Video erstellen &amp; herunterladen</button>
+    <button id="prev">▶ Nur Vorschau</button>
+  </div>
+  <div id="status">Klick auf <b>„Video erstellen"</b> → das Video läuft einmal durch (~28&nbsp;Sek.) und lädt sich am Ende automatisch herunter. In <b>Google Chrome</b> öffnen. Optional: eine Sprachdatei <b>voice-5euro.mp3</b> ins selbe Verzeichnis legen, dann wird sie automatisch mit aufgenommen.</div>
+<script>
+(function(){
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var coins=document.getElementById('coins');
+  var W=1080,H=1920,CX=540;
+  var status=document.getElementById('status');
+  var END=183000,PAID=54000,GAIN=129000;
+  function eur(n){return Math.round(n).toLocaleString('de-DE')+' €';}
+  function ease(t){return 1-Math.pow(1-t,3);}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+  var S=[0,2500,6000,11500,15500,22000,28000];
+  var TOTAL=28000;
+
+  function bg(){
+    ctx.fillStyle='#0a0f15';ctx.fillRect(0,0,W,H);
+    var g1=ctx.createRadialGradient(CX,300,60,CX,300,900);g1.addColorStop(0,'rgba(53,192,138,.20)');g1.addColorStop(1,'rgba(53,192,138,0)');ctx.fillStyle=g1;ctx.fillRect(0,0,W,H);
+    var g2=ctx.createRadialGradient(CX,1750,60,CX,1750,900);g2.addColorStop(0,'rgba(79,156,240,.16)');g2.addColorStop(1,'rgba(79,156,240,0)');ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);
+  }
+  function coverVid(){
+    if(coins.readyState<2){bg();return;}
+    var vw=coins.videoWidth||1080,vh=coins.videoHeight||1920;
+    var sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc;
+    ctx.drawImage(coins,(W-dw)/2,(H-dh)/2,dw,dh);
+    var g=ctx.createLinearGradient(0,H*0.45,0,H);g.addColorStop(0,'rgba(10,15,21,0)');g.addColorStop(1,'rgba(10,15,21,.92)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  function prog(t){
+    var x=40,top=44,gap=8,n=S.length-1,w=(W-80-gap*(n-1))/n;
+    for(var i=0;i<n;i++){
+      ctx.fillStyle='rgba(255,255,255,.18)';round(x,top,w,6,3);
+      var f=clamp((t-S[i])/(S[i+1]-S[i]),0,1);
+      ctx.fillStyle='#fff';round(x,top,w*f,6,3);
+      x+=w+gap;
+    }
+  }
+  function round(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.fill();}
+  function text(t,y,size,weight,color,align){ctx.fillStyle=color;ctx.textAlign=align||'center';ctx.textBaseline='middle';ctx.font=weight+' '+size+'px -apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif';ctx.fillText(t,align==='left'?80:(align==='right'?W-80:CX),y);}
+  function pill(t,y,bgc,fg){ctx.font='800 34px -apple-system,Helvetica,Arial,sans-serif';var w=ctx.measureText(t).width+56;ctx.fillStyle=bgc;round(CX-w/2,y-30,w,60,30);text(t,y,34,'800',fg);}
+  function footer(){text('Statistische Schätzung. Keine Anlageberatung.',H-34,24,'600','#5f7183');}
+  function alphaWrap(a,fn){ctx.save();ctx.globalAlpha=clamp(a,0,1);fn();ctx.restore();}
+
+  function draw(t){
+    var i=0;for(var k=0;k<S.length-1;k++){if(t>=S[k]&&t<S[k+1]){i=k;break;}if(t>=S[S.length-1])i=S.length-2;}
+    var lt=t-S[i];
+    var appear=ease(clamp(lt/450,0,1));
+    if(i===0){ // HOOK — Münzen-Clip + Text
+      coverVid();
+      var sh=Math.sin(t/70)*3;
+      ctx.save();ctx.translate(sh,0);pill('5 SEK · NICHT WEGSWIPEN',560,'#e5484d','#fff');ctx.restore();
+      alphaWrap(appear,function(){text('5 € am Tag',1380,150,'900','#f2f6fa');});
+      alphaWrap(ease(clamp((lt-350)/450,0,1)),function(){text('= nur dein Kaffeegeld ☕',1520,60,'700','#35c08a');});
+    } else if(i===1){ // OPEN LOOP
+      bg();
+      alphaWrap(appear,function(){text('Was, wenn du es',760,84,'900','#f2f6fa');text('anlegst –',870,84,'900','#f2f6fa');});
+      alphaWrap(ease(clamp((lt-300)/450,0,1)),function(){text('statt es zu vertrinken?',1030,66,'700','#9db0c2');});
+      alphaWrap(ease(clamp((lt-800)/450,0,1)),function(){text('Rechnen wir mit.',1200,58,'800','#5aa8ff');});
+    } else if(i===2){ // COUNTER eingezahlt
+      bg();
+      alphaWrap(appear,function(){text('DAS ZAHLST DU IN 30 JAHREN EIN',560,44,'700','#9db0c2');});
+      var e=ease(clamp(lt/3300,0,1));
+      text(eur(PAID*e),760,150,'900','#5aa8ff');
+      var N=14,cw=W-260,x0=130,gap=10,bw=(cw-gap*(N-1))/N,baseY=1400,maxH=440;
+      for(var b=0;b<N;b++){var tar=Math.pow((b+1)/N,1.2);var hh=maxH*tar*e;
+        ctx.fillStyle='#2f6ea0';round(x0+b*(bw+gap),baseY-hh,bw,hh,6);}
+      alphaWrap(ease(clamp((lt-3600)/500,0,1)),function(){text('150 € im Monat. Klingt mickrig, oder?',1520,52,'700','#b8c7d6');});
+    } else if(i===3){ // CLIFFHANGER Zinseszins
+      bg();
+      alphaWrap(appear,function(){text('Aber dann kommt',720,72,'900','#f2f6fa');});
+      var pl=ease(clamp((lt-200)/500,0,1));var sc=0.7+0.3*pl;
+      ctx.save();ctx.globalAlpha=pl;ctx.translate(CX,980);ctx.scale(sc,sc);ctx.translate(-CX,-980);text('der Zinseszins',980,96,'900','#35c08a');ctx.restore();
+      // steigende Kurve
+      var ce=ease(clamp((lt-500)/1400,0,1));
+      ctx.strokeStyle='#35c08a';ctx.lineWidth=14;ctx.lineCap='round';ctx.beginPath();
+      var x0=140,y0=1500,x1=940,steps=60;
+      for(var s=0;s<=steps*ce;s++){var p=s/steps;var xx=x0+(x1-x0)*p;var yy=y0-(y0-1150)*Math.pow(p,2.4);if(s===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);}
+      ctx.stroke();
+      alphaWrap(ce,function(){text('🚀',1120,120,'900','#fff');});
+    } else if(i===4){ // PAYOFF + Aufschlüsselung
+      bg();
+      alphaWrap(appear,function(){text('Aus 54.000 € werden',560,60,'700','#9db0c2');});
+      var pl=ease(clamp(lt/420,0,1));var sc=0.7+0.3*pl;
+      ctx.save();ctx.globalAlpha=pl;ctx.translate(CX,760);ctx.scale(sc,sc);ctx.translate(-CX,-760);text(eur(END),760,190,'900','#35c08a');ctx.restore();
+      alphaWrap(ease(clamp((lt-250)/400,0,1)),function(){text('🤯',940,120,'900','#fff');});
+      var e=ease(clamp((lt-900)/1300,0,1));
+      text('Selbst eingezahlt',1120,48,'700','#f2f6fa','left');text(eur(PAID),1120,48,'700','#9db0c2','right');
+      ctx.fillStyle='rgba(255,255,255,.08)';round(80,1170,W-160,60,14);
+      ctx.fillStyle='#5aa8ff';round(80,1170,(W-160)*(PAID/END)*e,60,14);
+      text('Geschenkt vom Zinseszins',1340,48,'700','#35c08a','left');text('+'+eur(GAIN),1340,48,'700','#35c08a','right');
+      ctx.fillStyle='rgba(255,255,255,.08)';round(80,1390,W-160,60,14);
+      ctx.fillStyle='#35c08a';round(80,1390,(W-160)*e,60,14);
+      alphaWrap(ease(clamp((lt-2400)/450,0,1)),function(){text('Ohne einen Cent mehr zu sparen.',1560,54,'800','#dfe9f2');});
+    } else { // CTA
+      bg();
+      alphaWrap(appear,function(){pill('Kostenlos · werbefrei',560,'rgba(255,255,255,.1)','#cfe0ee');});
+      alphaWrap(ease(clamp((lt-100)/400,0,1)),function(){text('Rechne DEINE',760,90,'900','#f2f6fa');text('Zahl aus.',870,90,'900','#35c08a');});
+      alphaWrap(ease(clamp((lt-350)/400,0,1)),function(){
+        ctx.fillStyle='#35c08a';round(CX-190,1030,20,90,4);text('InvestBlick',1075,88,'900','#f2f6fa','center');
+      });
+      var bl=0.6+0.4*Math.abs(Math.sin(t/350));
+      alphaWrap(bl,function(){text('Link in Bio – jetzt ausprobieren',1560,44,'700','#dfe9f2');text('↑',1640,60,'900','#dfe9f2');});
+    }
+    prog(t);
+    footer();
+  }
+
+  var rafId=null,startTs=null,recorder=null,chunks=[],audioEl=null,ac=null;
+  function loop(now){
+    if(startTs===null)startTs=now;
+    var t=now-startTs;
+    draw(Math.min(t,TOTAL));
+    if(t<TOTAL+250){rafId=requestAnimationFrame(loop);}
+    else{finish();}
+  }
+  function primeCoins(){try{coins.currentTime=0;coins.play().catch(function(){});}catch(e){}}
+  function startPreview(){cancel();primeCoins();startTs=null;rafId=requestAnimationFrame(loop);status.textContent='Vorschau läuft…';}
+  function cancel(){if(rafId)cancelAnimationFrame(rafId);rafId=null;}
+
+  function pickMime(){
+    var opts=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+    for(var i=0;i<opts.length;i++){if(window.MediaRecorder&&MediaRecorder.isTypeSupported(opts[i]))return opts[i];}
+    return '';
+  }
+
+  async function startRecord(){
+    cancel();
+    var mime=pickMime();
+    if(!mime){status.textContent='Dein Browser kann kein Video aufnehmen. Bitte in Google Chrome öffnen.';return;}
+    primeCoins();
+    var vstream=cv.captureStream(30);
+    var tracks=vstream.getVideoTracks();
+    try{
+      audioEl=new Audio('voice-5euro.mp3');audioEl.crossOrigin='anonymous';
+      ac=new (window.AudioContext||window.webkitAudioContext)();
+      if(ac.state==='suspended')await ac.resume();
+      var src=ac.createMediaElementSource(audioEl);
+      var dest=ac.createMediaStreamDestination();
+      src.connect(dest);src.connect(ac.destination);
+      dest.stream.getAudioTracks().forEach(function(tr){tracks.push(tr);});
+    }catch(e){}
+    var stream=new MediaStream(tracks);
+    chunks=[];
+    recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000});
+    recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
+    recorder.onstop=function(){
+      var blob=new Blob(chunks,{type:mime.indexOf('mp4')>=0?'video/mp4':'video/webm'});
+      var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download='investblick-5euro.'+ext;document.body.appendChild(a);a.click();a.remove();
+      var mb=(blob.size/1048576).toFixed(1);
+      status.innerHTML='✅ <b>Fertig!</b> Datei <b>investblick-5euro.'+ext+'</b> ('+mb+' MB) heruntergeladen.'+(ext==='webm'?' <br>Hinweis: Chrome hat WEBM erzeugt – für TikTok ggf. in CapCut kurz als MP4 exportieren.':' Direkt bei TikTok/Reels hochladbar.');
+    };
+    startTs=null;
+    recorder.start(200);
+    if(audioEl){try{audioEl.currentTime=0;await audioEl.play();}catch(e){}}
+    rafId=requestAnimationFrame(loop);
+    status.innerHTML='🔴 <b>Aufnahme läuft…</b> bitte warten (~28 Sek.), nichts anklicken.';
+  }
+  function finish(){
+    cancel();try{coins.pause();}catch(e){}
+    if(recorder&&recorder.state!=='inactive'){setTimeout(function(){try{recorder.stop();}catch(e){}},150);}
+    else{status.textContent='Vorschau beendet. Für die Datei auf „Video erstellen" klicken.';}
+  }
+  document.getElementById('make').onclick=startRecord;
+  document.getElementById('prev').onclick=startPreview;
+  coins.addEventListener('loadeddata',function(){draw(0);});
+  draw(0);
+})();
+</script>
+</body>
+</html>
